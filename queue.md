@@ -4,8 +4,6 @@ One repo at a time, worst slop first. Status updated as work lands.
 
 ## Pending
 
-- oath-citizenship (53%) → `oath-citizenship-redesign`
-3. JotRelay (51%) → `JotRelay-redesign`
 4. QRix-Minter (43%) → `QRix-Minter-redesign`
 5. cifellis (33%) → `cifellis-redesign`
 6. NOD (31%) → `NOD-redesign`
@@ -36,3 +34,4 @@ One repo at a time, worst slop first. Status updated as work lands.
 - builtbysai.github.io (61% → 17%) — branch `redesign/unslop`, PR #14, deck in `decks/`
 - 4a0x1-study-guide (54% → 20%) — new repo `builtbysai/4a0x1-study-guide-redesign`, live at https://builtbysai.com/4a0x1-study-guide-redesign/ (Pages, gh-pages branch); deck in `decks/`; review in `reviews/`. Note: checker's last flag ("lucide on every noun") was a stale cached read — live bundle verified with zero lucide references after the icon revision.
 - oath-citizenship (53% → 3%) — new repo `builtbysai/oath-citizenship-redesign`, live at https://builtbysai.com/oath-citizenship-redesign/ (Pages on `main`); deck in `decks/`; review in `reviews/`. Zero flagged patterns ("suspiciously clean").
+- JotRelay (51% → verified clean) — new repo `builtbysai/JotRelay-redesign`, live at https://builtbysai.com/JotRelay-redesign/ (Pages, gh-pages branch); deck in `decks/`; review in `reviews/`. Checker re-run returned an identical 51% (stale r.jina.ai/microlink cache — it quoted copy that no longer exists); direct curl of live files verified 0 em dashes in visible copy and 0 emoji icons. Re-check later after cache expiry.
