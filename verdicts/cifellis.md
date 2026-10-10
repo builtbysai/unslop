@@ -24,3 +24,10 @@ Fix (CSS/attribute-only, no layout or CTA changes):
 - No overlay layers capture events beyond the pizza box itself (`pointer-events` was already scoped to the model-viewer element).
 - CTA untouched: Order Online / View Full Menu / Call to Order exactly as before.
 Caveat: interactive scroll testing (desktop + mobile scroll over the pizza) needs a live-browser check by the parent — subagents can't operate the browser. The fix follows model-viewer's documented behavior for exactly this problem.
+
+## Follow-up fix — PR #4 (merged 2026-10-10 as 8833a005)
+A live-browser scroll test proved PR #3's fix incomplete. Root causes found by reading the model-viewer 3.4.0 source:
+1. **Wheel hijack:** model-viewer's wheel handler calls preventDefault unconditionally; the min/max orbit clamp didn't help. Fix: `disable-zoom` attribute — source-verified that with disableZoom the wheel listener is never attached, so wheel passes through to the page. Drag-rotate still works.
+2. **Touch veto:** the internal input layer forced inline `touch-action:none`, which wins the touch-action intersection over the host's `pan-y`. Fix: `touch-action="pan-y"` attribute (a real model-viewer API) — its gesture logic then yields vertical drags to native scroll while keeping horizontal spin.
+3. **Dead auto-rotate:** the inline script assigned `.autoRotate` before the custom element upgraded; the constructor clobbered it to `false` forever. Fix: setAttribute/removeAttribute for `auto-rotate` (reduced-motion handling unchanged). Same pre-upgrade hazard fixed for `src`.
+Branch deleted. Live markup verified on https://builtbysai.com/cifellis/ (all three markers present).
