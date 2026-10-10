@@ -1,14 +1,16 @@
 # Hans's verdict — first-english redesign (2026-10-10)
 
-Status: **accepted — merge redesign into original, then delete the redesign repo.**
+Status: **accepted — MERGED into the original. Redesign repo deleted.**
 
-## Notes
-1. Redesign is better — **use it as the original** (merge into `builtbysai/first-english`, then delete `builtbysai/first-english-redesign`). Explicit exception to never-touch-originals, authorized by Hans.
-2. **The settings icon in the redesign could be improved** — fix before merging.
-3. **More to do before this project is actually done** — Hans will discuss later. Do NOT treat as finished; leave thread open.
-4. **Emoji policy for this project:** Hans affirms that in first-english, there are places where emojis/images are the best fit by design. Do NOT strip emoji usage that serves the design — the 151 vocabulary emoji stay, and emoji/images may be used wherever they fit the lesson design. (Applies to the pending "more to do" discussion, not a revert of anything.)
+## Notes (from Hans)
+1. Redesign is better — **use it as the original** (merged into `builtbysai/first-english`, `builtbysai/first-english-redesign` deleted). Explicit exception to never-touch-originals, authorized by Hans.
+2. **Settings icon improved before merging** — the old gear read as a sun (circle + 8 spokes). Replaced with a proper toothed 8-tooth cog: same 24×24 viewBox, stroke-width 2, round caps/joins, 3.2 center hole — consistent with the other 23 hand-drawn symbols. Verified rendering at 24/48/96px against i-home for style match; live redesign confirmed serving it before merge.
+3. **Emoji policy (Hans, 2026-10-10):** in this project's design, emojis/images are the best fit in places — preserve ALL emoji exactly as-is. The 151 vocabulary emoji stay; emoji are welcome wherever they fit the lesson design. Verified post-merge: all 280 emoji characters on the live original are byte-identical to the redesign.
+4. **More to do before this project is actually done** — Hans will discuss later. Do NOT treat as finished; leave thread open.
 
-## Plan (authorized, running in background)
-- Improve the settings icon (hand-drawn, consistent with the redesign's 23 hand-drawn SVG symbol set).
-- Merge redesign into original (PR + merge), verify live at https://builtbysai.github.io/first-english/.
-- Delete the redesign repo; update hub decks/verdicts.
+## Outcome
+- PR: https://github.com/builtbysai/first-english/pull/1 — "Adopt the first-english redesign as the site" — merged as `91537f2`
+- Final tree: README.md (kept) + 15 redesign files; legacy versioned sources (v4–v11, qa/, src/, tools/) removed
+- Live: https://builtbysai.com/first-english/ (builtbysai.github.io/first-english/ 301-redirects there) serves the redesign with the new gear — verified via live HTML
+- Redesign repo: deleted (DELETE → 204, confirmed 404)
+- Hub: master deck first-english links retargeted to the original URL; standalone deck renamed decks/first-english.pptx
