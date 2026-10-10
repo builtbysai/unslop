@@ -4,8 +4,7 @@ One repo at a time, worst slop first. Status updated as work lands.
 
 ## Pending
 
-1. 4a0x1-study-guide (54%) → `4a0x1-study-guide-redesign`
-2. oath-citizenship (53%) → `oath-citizenship-redesign`
+- oath-citizenship (53%) → `oath-citizenship-redesign`
 3. JotRelay (51%) → `JotRelay-redesign`
 4. QRix-Minter (43%) → `QRix-Minter-redesign`
 5. cifellis (33%) → `cifellis-redesign`
@@ -35,3 +34,4 @@ One repo at a time, worst slop first. Status updated as work lands.
 ## Done
 
 - builtbysai.github.io (61% → 17%) — branch `redesign/unslop`, PR #14, deck in `decks/`
+- 4a0x1-study-guide (54% → 20%) — new repo `builtbysai/4a0x1-study-guide-redesign`, live at https://builtbysai.com/4a0x1-study-guide-redesign/ (Pages, gh-pages branch); deck in `decks/`; review in `reviews/`. Note: checker's last flag ("lucide on every noun") was a stale cached read — live bundle verified with zero lucide references after the icon revision.
