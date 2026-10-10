@@ -4,7 +4,6 @@ One repo at a time, worst slop first. Status updated as work lands.
 
 ## Pending
 
-6. NOD (31%) → `NOD-redesign`
 7. first-english (29%) → `first-english-redesign`
 8. creative-experiments (22%) → `creative-experiments-redesign`
 9. log-correlator-siem (9%) → light polish
@@ -35,3 +34,4 @@ One repo at a time, worst slop first. Status updated as work lands.
 - JotRelay (51% → verified clean) — new repo `builtbysai/JotRelay-redesign`, live at https://builtbysai.com/JotRelay-redesign/ (Pages, gh-pages branch); deck in `decks/`; review in `reviews/`. Checker re-run returned an identical 51% (stale r.jina.ai/microlink cache — it quoted copy that no longer exists); direct curl of live files verified 0 em dashes in visible copy and 0 emoji icons. Re-check later after cache expiry.
 - QRix-Minter (43% → 3%) — new repo `builtbysai/QRix-Minter-redesign`, live at https://builtbysai.com/QRix-Minter-redesign/ (Pages, gh-pages branch); deck in `decks/`; review in `reviews/`. Zero flagged patterns ("suspiciously clean").
 - cifellis (33% → 9%, last em-dash nitpick fixed post-check) — new repo `builtbysai/cifellis-redesign`, live at https://builtbysai.com/cifellis-redesign/ (Pages, gh-pages branch); deck in `decks/`; review in `reviews/`.
+- NOD (31% → 17%, both nitpicks fixed post-check) — new repo `builtbysai/NOD-redesign`, live at https://builtbysai.com/NOD-redesign/ (Pages, gh-pages branch); deck in `decks/`; review in `reviews/`. Post-check fixes: removed theme-toggle remnants (command palette entry + toggleTheme fn + initTheme now forces paper theme) and the last em dash. Note: live demo shows the app's graceful "Service unavailable" state for link creation (no Netlify Functions backend on Pages).
