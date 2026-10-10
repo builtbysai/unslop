@@ -8,7 +8,21 @@ One repo at a time, worst slop first. Status updated as work lands.
 
 ## Remaining
 
-### App UI redesigns (newer/private — bigger lifts)
+### App UI redesigns (bigger lifts — in progress: 4 security-tool report redesigns)
+
+### Reviews only — DONE (6/6, in `reviews/`)
+- fullframe: HiDPI region-recording pixel mismatch (`main.rs:265`)
+- Extensible-Terminal: per-byte parser-state clone in hot path (`terminal.rs:908`)
+- El-templato-d-amour: `math.random` override breaks integer callers (private repo, read-only)
+- SonicSight: ROI applied without coordinate transform — measures wrong patch (P0)
+- ad-automation-toolkit: temp passwords generated but never recorded (`New-BulkADUsers.ps1:99`)
+- ad-security-auditor: bare `[bool]::Parse` outside try/catch kills audit (`Test-StaleAccounts.ps1:19`)
+
+### Report redesigns — DONE (4/4, all live as `<repo>-redesign` on Pages, decks in `decks/`)
+- helpdesk-ticket-analytics → "The Weekly Ops Review" (printed ops handout)
+- phishing-email-analyzer → "The Intercept Dossier" (SIGINT analyst briefing)
+- winlog-threat-hunter → "The Morning Intel Brief" (new HTML report added via `--html-out`)
+- muse → "The Commonplace Book" (229 notes on 10 thematic shelves, pre-rendered pages)
 
 - Bridge, Beacon-Remote, Beacon-View, ColorTrace
 - helpdesk-ticket-analytics, phishing-email-analyzer, winlog-threat-hunter, muse
