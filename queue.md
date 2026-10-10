@@ -35,3 +35,4 @@ One repo at a time, worst slop first. Status updated as work lands.
 
 - builtbysai.github.io (61% → 17%) — branch `redesign/unslop`, PR #14, deck in `decks/`
 - 4a0x1-study-guide (54% → 20%) — new repo `builtbysai/4a0x1-study-guide-redesign`, live at https://builtbysai.com/4a0x1-study-guide-redesign/ (Pages, gh-pages branch); deck in `decks/`; review in `reviews/`. Note: checker's last flag ("lucide on every noun") was a stale cached read — live bundle verified with zero lucide references after the icon revision.
+- oath-citizenship (53% → 3%) — new repo `builtbysai/oath-citizenship-redesign`, live at https://builtbysai.com/oath-citizenship-redesign/ (Pages on `main`); deck in `decks/`; review in `reviews/`. Zero flagged patterns ("suspiciously clean").
