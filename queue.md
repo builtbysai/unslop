@@ -8,7 +8,11 @@ One repo at a time, worst slop first. Status updated as work lands.
 
 ## Remaining
 
-### App UI redesigns (bigger lifts — in progress: 4 security-tool report redesigns)
+### App UI redesigns — DONE (4/4, all live as `<repo>-redesign` on Pages, decks in `decks/`, checker-verified)
+- Bridge (17% → 17%, zero flags) → "The Signal Room" (encrypted-tunnel diagram, warm paper + signal orange)
+- ColorTrace (17% → 3%) → "The Lab Notebook" (honest swatches, mono readouts)
+- Beacon-Remote (17% → 3%) → "Mission Control, elevated" (conservative; luminous presence system, hand-drawn SVGs; demo-data harness stands in for private backend)
+- Beacon-View (17% → 17%, zero flags) → "The Quiet Watchtower" (conservative; cinematic camera tiles, amber privacy badge; demo-data harness stands in for private backend)
 
 ### Reviews only — DONE (6/6, in `reviews/`)
 - fullframe: HiDPI region-recording pixel mismatch (`main.rs:265`)
