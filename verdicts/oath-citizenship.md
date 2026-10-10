@@ -17,6 +17,7 @@ Status: **accepted — MERGED into original, redesign repo DELETED.**
 - **UI/UX rework**: bunting-rule header (crisp blue/red stripes), certificate double-rule masthead, navy mock-interview card (navy-and-gold certificate holder motif), red-star seal, sticky study-filter chips, blue focus rings, solid progress bars (no gradients).
 - **PR**: https://github.com/builtbysai/oath-citizenship/pull/1 (branch `redesign/oath-v2` → `main`)
 - **Merged**: commit `ace7483f` (merge commit).
+- **Follow-up cleanup PR #2** (https://github.com/builtbysai/oath-citizenship/pull/2, merged as `50b7f347`): the Git Data API merge kept the old top-level files via `base_tree`, so a second PR removed the dead legacy files (`app.js`, `build.py`, `n400.js`, `template.html`, `oath_v2.html`, `qa/`). Final tree is exactly the redesign's file set. Both PR branches deleted.
 - **Live original verified**: https://builtbysai.github.io/oath-citizenship/ serves the new design (byte-identical HTML to the built file).
 - **Redesign repo deleted**: `builtbysai/oath-citizenship-redesign` returns 404.
 - Legacy files removed in the merge: top-level `app.js`, `build.py`, `n400.js`, `template.html`, `oath_v2.html`, `qa/` (superseded by `src/` build layout; rebuild with `python3 src/build.py`).
