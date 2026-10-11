@@ -1,0 +1,147 @@
+{
+  "format": "colortrace",
+  "schemaVersion": 1,
+  "traceId": "6fa06104-2f08-404b-a8fd-a21e5d9fb489",
+  "capturedAt": "2026-10-10T11:40:02.000Z",
+  "intent": {
+    "authoredExpression": "var(--link)",
+    "parsed": {
+      "space": "srgb",
+      "channels": [
+        0.055,
+        0.647,
+        0.914
+      ],
+      "alpha": 1
+    },
+    "property": "color",
+    "recipeKind": "custom-property",
+    "confidence": "proven"
+  },
+  "appearance": {
+    "value": {
+      "space": "srgb",
+      "channels": [
+        0.055,
+        0.647,
+        0.914
+      ],
+      "alpha": 1
+    },
+    "interpretation": "resolved-style",
+    "captureMethod": "computed-style",
+    "outputColorSpace": "srgb",
+    "gamut": "srgb",
+    "dynamicRange": "sdr",
+    "confidence": "resolved"
+  },
+  "authority": {
+    "authority": "author",
+    "reason": "authored-value-used",
+    "forcedColorAdjust": "auto",
+    "confidence": "proven"
+  },
+  "target": {
+    "tagName": "a",
+    "id": null,
+    "classes": [],
+    "role": "link",
+    "selectorHint": "a"
+  },
+  "state": {
+    "pseudoClasses": [],
+    "pseudoElement": "none",
+    "colorScheme": "light",
+    "forcedColors": "none",
+    "reducedMotion": "no-preference",
+    "reducedTransparency": "unknown",
+    "contrastPreference": "no-preference"
+  },
+  "environment": {
+    "browser": {
+      "family": "chromium",
+      "version": "141.0.0.0"
+    },
+    "viewport": {
+      "widthCssPx": 1440,
+      "heightCssPx": 900,
+      "devicePixelRatio": 2
+    },
+    "pageOrigin": "https://docs.example",
+    "documentUrlHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "evidence": {
+    "nodes": [
+      {
+        "id": "observed",
+        "kind": "observed-color",
+        "label": "Observed text color",
+        "value": "#0ea5e9",
+        "confidence": "resolved",
+        "source": null
+      },
+      {
+        "id": "token",
+        "kind": "project-token",
+        "label": "color.link.default",
+        "value": "#0ea5e9",
+        "confidence": "proven",
+        "source": {
+          "kind": "project-token",
+          "stylesheetUrlHash": null,
+          "selector": null,
+          "property": null,
+          "line": null,
+          "column": null
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "observed",
+        "to": "token",
+        "relation": "matches-token",
+        "confidence": "proven"
+      }
+    ]
+  },
+  "tokenEvidence": {
+    "selectedTokenId": "color.link.default",
+    "status": "proven",
+    "candidates": [
+      {
+        "tokenId": "color.link.default",
+        "displayName": "color.link.default",
+        "status": "proven",
+        "resolvedValue": {
+          "space": "srgb",
+          "channels": [
+            0.055,
+            0.647,
+            0.914
+          ],
+          "alpha": 1
+        },
+        "reasons": [
+          "source-reference"
+        ],
+        "deltaEOK": 0
+      }
+    ]
+  },
+  "privacy": {
+    "exposure": "low",
+    "included": {
+      "colorData": true,
+      "cssEvidence": true,
+      "tokenMetadata": true,
+      "elementFingerprint": true,
+      "screenshotCrop": false,
+      "elementText": false,
+      "formValues": false,
+      "pageSource": false,
+      "cookies": false
+    }
+  },
+  "annotations": []
+}
