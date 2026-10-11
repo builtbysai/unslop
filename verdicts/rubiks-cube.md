@@ -75,3 +75,42 @@ PR #6: https://github.com/builtbysai/rubiks-cube/pull/6 — squash-merged `9b4eb
 - Move-count semantics otherwise (180° user/scramble moves still count as one).
 - Visual design, layout, mobile breakpoints (all reviewed, all fine).
 - The em-dash placeholder glyphs in numeric readouts (standard UI, not prose).
+
+## Improvement pass — done 2026-10-11 (Hans's orders)
+Hans: "Continue using it and continue improving it... I don't like how the final solved screen looks. Also there's a button that changes the style... Visually review and improve. Also make pwa."
+
+PR #7: https://github.com/builtbysai/rubiks-cube/pull/7 — squash-merged `a03fe310`.
+
+### 1. Solved screen redesign
+The old overlay was a flat "Solved!" line with a small stat sentence. Rebuilt as a proper achievement moment:
+- "Solved" headline with the cube badge and "New best!" tag
+- Time / Moves / Date stat cards, personal-best line ("Personal best 1:15 · 42 moves · 3 solves")
+- Two actions: "New scramble" (primary) and "Admire it" (dismisses the overlay so you can look at the finished cube)
+- Verified via real end-to-end: scramble → manual moves → solver → guide play → win shows correct Time/Moves/Date; Admire dismisses; assisted solves correctly skip bests.
+
+### 2. Style switcher fixed (the button Hans didn't understand)
+- The cryptic icon toggle is gone. A labeled **Classic / Glow** segmented control in the utility bar says exactly what it does; switching announces via status toast ("Glow style: luminous stickers."); help overlay documents it; `aria-pressed` synced; choice persists.
+- Renamed "glass" → **glow**: the old translucent variant rendered muddy and dark (no envmap, opacity 0.62). Glow uses luminous emissive stickers on a dark body — all six colors stay readable mid-solve. Verified visually on a scrambled cube. Old `rc.skin=glass` values migrate automatically.
+- Bonus find while touching this: `clearHint()` referenced an undefined `glass` variable (ReferenceError when clearing a hint while glowing) — fixed by renaming to the in-scope `skin`.
+
+### 3. PWA
+- `manifest.webmanifest` (standalone, theme `#0b0c10`), icons 192/512/maskable/apple-touch generated from a render of the real 3D cube
+- `sw.js` service worker: cache-first app shell (`rubiks-cube-v1`) including vendored three.js + the solver; old caches purged on activate
+- three.js vendored locally (`vendor/three/`) instead of CDN — true offline play requires it. Fonts (Google CDN) degrade gracefully to system fonts offline.
+- Verified: SW registered, cache populated, all PWA assets 200.
+
+### 4. Testing
+- CDP end-to-end on a fast test copy: scramble(4)+2 manual moves → 6 counted, timer running, solver→guide→play→win (Time/Moves/Date correct), Admire dismisses, glow toggle persists, SW+cache OK, zero console errors
+- Desktop 1440 + mobile 390 screenshots reviewed: win card, glow skin, main layout, utility bar with the wider segmented control — all clean, no overflow
+- `node --test tests/orbit-reference-model.test.mjs` pass; module syntax check clean
+- Live: https://builtbysai.github.io/rubiks-cube/ → 200 with new markers (`winDate`, `skinSeg`, vendored three path); sw.js, manifest, icons all 200
+
+### Before/after shots (shots/rubiks-cube/)
+- win-redesign-before.png → win-redesign-after.png (+ win-redesign-mobile-after.png)
+- glass-style-before.png (muddy) → glow-style-after.png (scrambled, readable) + glow-style-solved.png
+- mobile-main-after.png
+
+### Notes
+- Headless CDP is ~10x slower than real browsers (dt clamp); not an app bug. Solver init itself is ~2s; the earlier "solver timeout" was the test clicking Solve while the cube was still mid-scramble (busy guard correctly ignored it), and later waiting for a win while the guide tray sat unplayed (correct behavior).
+- Vendored solver quirk (not touched): `Cube.fromString(solved).solve()` returns a non-empty 12-move round trip for an already-solved cube — harmless (leaves it solved), out of scope.
+- `log-correlator-siem-redesign` branch still exists; JotRelay PR #141 housekeeping still open. Neither touched.

@@ -55,3 +55,9 @@ Also added `sample_data/tickets_prev_period.csv` (585 synthetic tickets, Feb-Apr
 - PDF export shells out to Chromium; it is not pure-Python and needs a Chromium/Chrome binary. requirements.txt stays dependency-free; the README says so plainly.
 - Real-data claims: none made. The loader hardening + README column docs are the substitute, as instructed.
 - `gitdata-push` delete-branch quirk: the first DELETE returned 204 (branch gone) but the JSON parser choked on the empty body; second attempt 422'd because it was already deleted. Harmless.
+
+## Hiring-lens pass (2026-10-11)
+Hans: "make it look like I'm the best and help me get jobs."
+- README rewritten: live demo link + one-line pitch up top, plain-spoken Skills section (Python, data analysis, SVG charting, CLI design, 31 tests). Zero em dashes.
+- Repo metadata: homepage set to the demo link; topics added (cli, data-visualization).
+- PR #4 squash-merged as 5ada965f; branch deleted. Demo verified 200.
