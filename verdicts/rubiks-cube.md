@@ -151,3 +151,7 @@ Hans asked point-blank whether PR #7's UI was reviewed for fit. This time every 
 ### Verification
 - `node tests/orbit-reference-model.test.mjs` pass; inline module syntax clean (`node --check`).
 - Live: https://builtbysai.github.io/rubiks-cube/ → 200, `skinSeg` absent from served HTML, win overlay markers (`btnCloseWin`, no `winAdmire`/`winBadge`) confirmed.
+
+## Deferred (Hans, 2026-10-11 — after other priorities)
+1. **Smarter solver.** Hans: the solver should find the short solution — in his test it proposed 15 moves for a position that should be one move. The solver needs to be genuinely smarter (optimal or near-optimal for short distances), not just a valid path.
+2. **PWA update check.** The service worker needs an update-check system so new deploys actually reach installed users (check on launch, prompt to refresh).
