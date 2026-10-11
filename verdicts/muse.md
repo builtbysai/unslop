@@ -1,4 +1,93 @@
-# muse: v3 rebuild (2026-10-11) — SHIPPED AND LIVE
+# muse: v3 rebuild (2026-10-11) — CURRENT STATE
+
+**What is live right now:** the porcelain/Prussian-blue v3 (PR #3, merged
+as `2fc0b0e2`; gh-pages deployed as `567c3554`). Verified live
+2026-10-11 ~03:35 UTC: https://builtbysai.com/muse-redesign/ returns 200,
+title "Muse, a Reading Room", v3 kicker + CSS present, warm-paper CSS
+absent, "Steal the technique" absent, 229 note links, 10 shelves. Note
+pages 200.
+
+**History:** two v3 attempts were built in parallel overnight. The first
+("The Print Room": gallery white `#fbfbfa` + oxide red, PR #2 merged as
+`7f87f0f`, gh-pages `ce1e57c`) is superseded but preserved in git history.
+The second (porcelain `#f7f8f7` + Prussian blue `#10406b`, catalogue rows
+instead of cards, PR #3) is what is live. Both are documented below; the
+parent should show Hans one and confirm which stands.
+
+## v3 as shipped: quiet scholarly reading room (porcelain + Prussian blue)
+
+Design rationale. Every choice is grounded in the scholarship:
+
+- **Porcelain background `#f7f8f7`, ink text `#1a1e20`, hairline rules
+  `#dfe3e2`.** The feel of a museum study room under daylight. Deliberately
+  not warm paper (rejected across every project this week) and not dark
+  (229 long-form notes must be read; light surfaces serve extended
+  reading).
+- **One accent: Prussian blue `#10406b`.** A pigment with a genuine
+  art-history lineage (early 18th century, the blue of Hokusai's wave,
+  the ink of countless etchings). Used sparingly: the top rule, the drop
+  cap, link hovers, the active shelf marker, blockquote rules.
+- **Typography does the work.** System serif for long-form reading
+  (Iowan Old Style / Palatino / Georgia, offline-safe, works from
+  file://); quiet sans small caps for apparatus (kickers, colophon,
+  metadata, labels), like a scholarly journal's running heads. The notes'
+  own titles and prose are the heroes; chrome is minimal.
+- **Catalogue entries, not cards.** Flat hairline-separated rows under
+  Roman-numeralled shelves, like a library catalogue or museum inventory.
+  No shadows, no pills, no gamified counters. The colophon is a plain
+  bibliographic fact line (notes, words, shelves, source), not marketing.
+- **The ten shelf identities are kept** (names, numerals, blurbs, small
+  color swatches from v1) because they are hand curation worth honoring;
+  only their presentation changed.
+- Copy rules enforced in the generator: no em dashes, no emoji, no
+  marketing language, no AI-tell phrasing in generator-authored copy.
+  (Em dashes inside note titles/excerpts are Hans's data, never
+  rewritten.)
+
+What was built:
+
+- `build_index.py`: v1's architecture recovered from `fda8c64` (same
+  stdlib-only markdown renderer, same SLUG_THEME filing, same search JS
+  and `?theme=`/`?q=` deep-link scheme), with a fully rewritten CSS
+  system and quiet copy. v2's `build_site.py` and its extra pages
+  (avoid.html, doorways.html, gaps.html) removed.
+- `site/`: regenerated index.html, before.html, 229 note pages.
+- Branch `v3-reading-room` -> PR #3
+  (https://github.com/builtbysai/muse-redesign/pull/3) -> squash-merged
+  to `main` (`2fc0b0e2`).
+- Deployed to `gh-pages` (`567c3554`): root index.html, before.html,
+  notes/*, plus build_index.py and README.md.
+- Screenshots: `screenshots/after/muse-v3-index-desktop.png`,
+  `muse-v3-note-desktop.png`, `muse-v3-index-mobile.png`,
+  `muse-v3-note-mobile.png` (desktop 1280 + mobile 390, served locally
+  via a private CDP port; this VM's headless browser has no outbound
+  network, so live bytes were verified separately via curl).
+
+Verification:
+
+- All 229 notes parse; zero missing themes; 410,981 words.
+- Generator copy: zero em dashes, zero emoji, zero marketing phrases
+  (audited by grep; "steal" hits are inside note content, which is data).
+- Visual passes: index (masthead, colophon, search, shelf filters,
+  catalogue rows), note page (shelf tag, drop cap, catalogue definition
+  list, headings, lists, blockquote), mobile 390px (filters stack,
+  catalogue stacks, pagenav single column).
+- Live: index 200 with v3 title/kicker/CSS; note page 200 with shelf tag;
+  "Steal the technique" absent from both.
+- Formal slop-checker run still to do via live browser by the parent
+  (ai-slop-checker.vercel.app has no API; screenshot-mode floor ~17%;
+  note the standing cache caveat).
+
+---
+
+# muse: v3 "The Print Room" (2026-10-11) — SUPERSEDED, kept for the record
+
+> This was the first overnight v3 attempt (gallery white + oxide red).
+> It was merged as PR #2 (`7f87f0f`) and briefly live (gh-pages
+> `ce1e57c`), then superseded by the porcelain/Prussian-blue v3 above
+> (PR #3). Preserved in git history; screenshots renamed to
+> `screenshots/after/muse-v3-printroom-index.png` and
+> `muse-v3-printroom-note.png`.
 
 Hans rejected v2 ("looks like slop and disrespectful to the idea"): the
 hustle-culture marketing framing ("Steal the technique. Skip the trap.",
@@ -6,8 +95,10 @@ hustle-culture marketing framing ("Steal the technique. Skip the trap.",
 v2 was removed from the live site; v1 ("Commonplace Book" reading room)
 was restored as interim. v3 was then rebuilt on v1's architecture.
 
-**Live:** https://builtbysai.com/muse-redesign/ (PR #2 merged as `7f87f0f`,
-gh-pages deployed as `ce1e57c`, verified 200 serving the v3 palette.)
+**Was live briefly:** https://builtbysai.com/muse-redesign/ (PR #2 merged as
+`7f87f0f`, gh-pages deployed as `ce1e57c`, verified 200 serving the
+gallery-white palette). Superseded 2026-10-11 ~03:30 UTC by the
+porcelain/Prussian-blue v3 (PR #3, gh-pages `567c3554`).
 
 ## Design rationale: "The Print Room"
 
@@ -53,25 +144,24 @@ A quiet, scholarly digital reading room. Every choice grounded:
 
 - Live index + note page return 200; served HTML confirmed carrying
   `surface:#fbfbfa` (v3). Title "Muse, a Commonplace Book" kept.
-- Screenshots: `screenshots/after/muse-v3-index.png`,
-  `muse-v3-note.png`, `muse-v3-index-mobile.png`,
-  `muse-v3-note-mobile.png` (all pixel-verified as the v3 site).
+- Screenshots: `screenshots/after/muse-v3-printroom-index.png`,
+  `muse-v3-printroom-note.png` (desktop; pixel-verified as the
+  gallery-white site).
 - Screenshot note: one capture in the batch picked up a sibling agent's
   page (known shared-CDP-port hazard on this VM); retaken on a private
   port and pixel-verified.
 - Formal slop-checker run still to do via live browser by the parent
   (checker has no API; screenshot-mode floor is ~17%).
 
-## Coordination note (2026-10-11)
+## Coordination note (2026-10-11, resolved)
 
-A sibling agent appears to have built a *different* v3 in parallel
-(porcelain `#f7f8f7` + Prussian blue `#10406b`, catalogue rows instead
-of cards; screenshots `muse-v3-*-desktop.png`, described in the earlier
-draft of this file's top section). It pushed a branch also named
-`v3-reading-room` but did NOT touch main or gh-pages. What is live
-right now is the gallery-white/oxide-red v3 described above. The parent
-should reconcile: show Hans one, archive or discard the other. Do NOT
-let both land on main/gh-pages.
+Two v3 attempts were built in parallel overnight (see the current-state
+section at the top of this file). The porcelain/Prussian-blue v3 (PR #3)
+is merged and live; the gallery-white/oxide-red "Print Room" v3 (PR #2)
+is preserved in git history. Both screenshot sets are in
+`screenshots/after/` (`muse-v3-*-desktop/mobile.png` vs
+`muse-v3-printroom-*.png`). Nothing is lost; the parent shows Hans one
+and confirms which stands.
 
 ---
 
