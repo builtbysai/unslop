@@ -32,3 +32,26 @@ Grounded in mission-control / NOC wall-monitor conventions, and in the report's 
 
 ### Merge
 - PR #2: https://github.com/builtbysai/helpdesk-ticket-analytics/pull/2 → squash-merged `512d4632`; branch deleted.
+
+## Round 3 (2026-10-11, overnight queue item 4) — full program improvements
+PR #3: https://github.com/builtbysai/helpdesk-ticket-analytics/pull/3 → squash-merged `138b65de`; branch deleted. Version bumped to 0.2.0.
+
+### What shipped
+1. **Month-over-month trend comparison** (`--compare prev.csv`): new `ticket_analytics/compare.py` computes deltas on SLA compliance (overall + per priority), median/avg resolution, open backlog, breach count, ticket volume. HTML report gets a "Versus the previous period" section with delta badges (green = better, red = worse, gray = context for volume); console prints the same table. 10 new tests on delta math + good/bad/neutral sentiment.
+2. **PDF export** (`--pdf-out report.pdf`): shells to headless Chromium `--print-to-pdf` using the existing `@media print` stylesheet (light version, 7 pages verified). Zero new dependencies. Clean error + exit 2 when no Chromium found (`CHROMIUM_BIN` env or PATH).
+3. **README workflow demo**: 30-second explainer (CSV in → report out → one command), metrics glossary, required-columns doc for real exports, `assets/report-preview.png` screenshot embedded. Fixed the stale "warm paper, serif" paragraph (dark ops console since round 2).
+4. **Real-data validation (honest)**: no real exports available, so instead the loader was hardened for real-world messiness — UTF-8/cp1252 fallback, ISO + US date formats, priority aliases (P1-P4, urgent, normal, case-insensitive), timezone normalization, blank-row skipping, line-numbered errors on malformed rows instead of silent drops. 7 new messy-fixture loader tests. README documents required columns and says plainly that sample data is synthetic.
+
+Also added `sample_data/tickets_prev_period.csv` (585 synthetic tickets, Feb-Apr 2026, worse breach rate via `scripts/generate_prev_period.py`) so `--compare` is demoable out of the box.
+
+### Verification
+- `pytest -q`: 31/31 passed (14 original untouched + green, 17 new).
+- Sample report regenerated with `--compare`: comparison section renders, badge semantics reviewed in screenshot.
+- `--pdf-out`: 7-page PDF produced via headless Chromium; missing-Chromium path exits 2 with a clear message.
+- Screenshots: `screenshots/helpdesk-report-full-v3.png` (full report v3), `screenshots/helpdesk-comparison-section.png` (comparison close-up), `screenshots/helpdesk-pdf-proof.png` (PDF page 1, light print style).
+- gh-pages regenerated (new index.html + tree sync); live preview verified via direct curl: https://builtbysai.com/helpdesk-ticket-analytics/ serves the new report.
+
+### Honest notes
+- PDF export shells out to Chromium; it is not pure-Python and needs a Chromium/Chrome binary. requirements.txt stays dependency-free; the README says so plainly.
+- Real-data claims: none made. The loader hardening + README column docs are the substitute, as instructed.
+- `gitdata-push` delete-branch quirk: the first DELETE returned 204 (branch gone) but the JSON parser choked on the empty body; second attempt 422'd because it was already deleted. Harmless.

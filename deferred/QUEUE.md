@@ -23,8 +23,9 @@ File: `deferred/spiritual-seasons-responsive-rebuild.md`. Screen-by-screen revie
 ### 3. VOXMIDI Dubler-2 rebuild — ✅ DONE 2026-10-11
 File: `deferred/voxmidi-rebuild.md`. Ground-up rebuild in the original repo (builtbysai/VOXMIDI): real-time YIN pitch-to-MIDI (Basic Pitch researched and rejected as offline-only), 4-step onboarding (mic explainer, level meter, device picker, hum-a-note lock), 14-scale quantization, beatbox drums with trainable pads, Web MIDI out + built-in synth fallback, session record to .mid, playable keyboard/pads. PR #2 merged (`02850d4f`), live 200 verified at https://builtbysai.github.io/VOXMIDI/. 29/29 node DSP tests pass; full click-through in headless Chromium with fake mic, zero console errors. Screenshots: screenshots/voxmidi/. Verdict: verdicts/whistlebox.md. Needs Hans's ears for real-mic feel.
 
-### 4. Helpdesk-ticket-analytics program improvements
-File: `deferred/helpdesk-ticket-analytics-improvements.md`. Real anonymized data validation, month-over-month trends, PDF export, README workflow demo.
+### 4. Helpdesk-ticket-analytics program improvements — DONE 2026-10-11
+File: `deferred/helpdesk-ticket-analytics-improvements.md`. Shipped as PR #3 (merged `138b65de`): `--compare` period-over-period trend section (delta badges, good/bad/neutral) + console table, `--pdf-out` via headless Chromium (clean error without it, no new deps), README 30-second workflow demo with embedded report screenshot, loader hardened for real-world CSV messiness (cp1252, US dates, priority aliases, line-numbered errors) with honest synthetic-data-only note. 31/31 tests green. gh-pages regenerated, live preview verified. Verdict file updated. Screenshots in `screenshots/helpdesk-*.png`.
+- Supersedes: `deferred/helpdesk-ticket-analytics-improvements.md` (mark done).
 
 ### 5. Tyler Hobbs-inspired works
 File: `deferred/tyler-hobbs-inspired-works.md`. Study Fidenza, create an original inspired piece + a couple more Hobbs-style works for the doodles backfill. Feeds the gallery mega-task; keep consistent with whatever display system emerges.
