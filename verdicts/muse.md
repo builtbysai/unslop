@@ -1,3 +1,80 @@
+# muse: v3 rebuild (2026-10-11) — SHIPPED AND LIVE
+
+Hans rejected v2 ("looks like slop and disrespectful to the idea"): the
+hustle-culture marketing framing ("Steal the technique. Skip the trap.",
+"243 stealable techniques" counters) trivialized genuine art scholarship.
+v2 was removed from the live site; v1 ("Commonplace Book" reading room)
+was restored as interim. v3 was then rebuilt on v1's architecture.
+
+**Live:** https://builtbysai.com/muse-redesign/ (PR #2 merged as `7f87f0f`,
+gh-pages deployed as `ce1e57c`, verified 200 serving the v3 palette.)
+
+## Design rationale: "The Print Room"
+
+A quiet, scholarly digital reading room. Every choice grounded:
+
+- **Cool gallery white `#fbfbfa`, not paper.** Art-historical scholarship
+  is read in museum print rooms and study centers: neutral white walls,
+  precise light, nothing competing with the work. Deliberately not
+  warm/cream (warm = the rejected paper). Not dark either: 229 long-form
+  notes must be read, and light surfaces serve extended reading.
+- **One accent: oxide red `#8c3b2e`.** The red of sanguine chalk and
+  printers' ink, the color of the etched line's own tradition. It was
+  v1's accent and it earned its keep; kept for continuity.
+- **System serif kept** (Iowan Old Style, Palatino, Georgia). Long-form
+  art-historical prose deserves a book serif. The notes are the heroes.
+- **Minimal chrome.** The double rules and paper-texture gradients were
+  fake-book signifiers; replaced with hairlines. Quieter masthead
+  (smaller display size). The 10 shelf colors kept as small functional
+  markers (shelf identity, not page palette). Catalogue cards kept from
+  v1 (white, hairline borders, subtler shadows).
+- **Drop caps kept** on real prose. Search, `?theme=`/`?q=` deep links,
+  prev/next shelf navigation, catalogue blocks, all 10 shelves preserved.
+- **Zero marketing copy.** No counters as hero content, no reductive
+  language. The colophon states plain facts (229 notes, 410,981 words,
+  10 shelves). (The word "stealable" appears in the search index only
+  because it is Hans's own vocabulary inside his notes: his data, never
+  rewritten.)
+
+## What changed from v1 (code)
+
+- `build_index.py`: v1's generator (recovered from `fda8c64`) with a
+  rewritten CSS system (17 precise edits: palette, hairlines, quieter
+  masthead, neutral code colors, small-screen padding) + docstring.
+  All other logic byte-identical (markdown renderer, parsing, SLUG_THEME
+  filing, search JS, deep links).
+- `build_site.py` (v2's generator) deleted. README rewritten.
+- `site/`: regenerated (229 note pages + index + before.html).
+  Zero em dashes in generator copy (verified by grep).
+- Constraints honored: stdlib-only, no CDN, inline CSS/JS, works from
+  file://.
+
+## Verification
+
+- Live index + note page return 200; served HTML confirmed carrying
+  `surface:#fbfbfa` (v3). Title "Muse, a Commonplace Book" kept.
+- Screenshots: `screenshots/after/muse-v3-index.png`,
+  `muse-v3-note.png`, `muse-v3-index-mobile.png`,
+  `muse-v3-note-mobile.png` (all pixel-verified as the v3 site).
+- Screenshot note: one capture in the batch picked up a sibling agent's
+  page (known shared-CDP-port hazard on this VM); retaken on a private
+  port and pixel-verified.
+- Formal slop-checker run still to do via live browser by the parent
+  (checker has no API; screenshot-mode floor is ~17%).
+
+## Coordination note (2026-10-11)
+
+A sibling agent appears to have built a *different* v3 in parallel
+(porcelain `#f7f8f7` + Prussian blue `#10406b`, catalogue rows instead
+of cards; screenshots `muse-v3-*-desktop.png`, described in the earlier
+draft of this file's top section). It pushed a branch also named
+`v3-reading-room` but did NOT touch main or gh-pages. What is live
+right now is the gallery-white/oxide-red v3 described above. The parent
+should reconcile: show Hans one, archive or discard the other. Do NOT
+let both land on main/gh-pages.
+
+---
+
 # muse: v2 rethink (2026-10-10)
 
 Hans's verdict on the v1 redesign ("i dont like the color and style. think
