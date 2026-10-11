@@ -1,12 +1,16 @@
-# Hans's verdict — whistlebox → VOXMIDI (2026-10-10)
+# Hans's verdict — VOXMIDI (renamed from whistlebox) (2026-10-10)
 
-Status: **repo renamed; project acknowledged as early prototype.**
+Status: **renamed, em-dash cleanup merged, redesign deleted. Full rebuild deferred.**
 
-## Notes
-1. Redesign changed only em-dash copy (title, MIDI dropdown, status line, key result). Nothing functional.
-2. **Repo renamed** `whistlebox` → `VOXMIDI` (2026-10-10, via API). The app already titled itself "VoxMIDI: voice to MIDI controller" — the rename aligns the repo with the product.
-3. **What he was building:** zero-install web app turning whistling/humming/beatboxing into MIDI instruments — "whistle melodies, beatbox drums, one-person band." Single index.html, one day of work (Oct 3). Hans: currently unusable, lots to go before calling it a project.
-4. whistlebox-redesign repo: now doubly redundant (rename + em-dash-only changes) — pending Hans's call.
+## Done 2026-10-10
+1. Repo renamed `whistlebox` → `VOXMIDI` (matches the app's own title).
+2. Em-dash cleanup merged into the original: PR #1 (squash `ae3b1cd1`) — 5 substitutions in index.html (title, MIDI dropdown, status line, key result). No design/logic changes. The `Level —` no-data placeholder left as-is.
+3. `whistlebox-redesign` deleted (204). Live verified: https://builtbysai.github.io/VOXMIDI/ (200).
 
-## Open
-- Assess what it would take to make VOXMIDI actually usable (pitch detection reliability, MIDI output, mic-permission onboarding) — when Hans wants.
+## Deferred: VOXMIDI full rebuild (after full repo audit — Hans's order)
+Hans confirmed the goal: a **Dubler 2 (Vochlea) clone**. Current state is far off — design, UX, UI all need a ground-up rebuild.
+Plan when the audit is done:
+1. Research Dubler 2 (Vochlea) — features, UX, pricing, positioning.
+2. Research Spotify Basic Pitch: https://basicpitch.spotify.com/, https://github.com/spotify/basic-pitch-ts, https://github.com/spotify/basic-pitch.
+3. Clone the Spotify repo if needed.
+4. Build an actual complete product: good design, good UI, good UX, usable, user-friendly, easy to understand.
