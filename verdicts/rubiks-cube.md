@@ -114,3 +114,40 @@ The old overlay was a flat "Solved!" line with a small stat sentence. Rebuilt as
 - Headless CDP is ~10x slower than real browsers (dt clamp); not an app bug. Solver init itself is ~2s; the earlier "solver timeout" was the test clicking Solve while the cube was still mid-scramble (busy guard correctly ignored it), and later waiting for a win while the guide tray sat unplayed (correct behavior).
 - Vendored solver quirk (not touched): `Cube.fromString(solved).solve()` returns a non-empty 12-move round trip for an already-solved cube — harmless (leaves it solved), out of scope.
 - `log-correlator-siem-redesign` branch still exists; JotRelay PR #141 housekeeping still open. Neither touched.
+
+## Follow-up pass — done 2026-10-11 (Hans's pushback on PR #7)
+Hans: (1) "Did you ever visually review the changes you made to the UI to see if the UI additions fit in?" (2) "I don't think we need a classic and glow view." (3) "Search famous Rubik's cube sites to understand what is actually important." Then: remove the "Admire it" button; remove the rainbow color-circle badge ("gives slop").
+
+PR #8: https://github.com/builtbysai/rubiks-cube/pull/8 — squash-merged `4e09add4` (branch followup/pr8 deleted).
+
+### 1. Classic/Glow toggle removed — one look kept
+- Hans: no toggle. Evaluated honestly: the glow finish (luminous emissive stickers, emissiveIntensity 1.15, dark body 0x0d1017) keeps all six colors readable on the dark stage; the classic matte finish sat flatter and darker by comparison. Kept **glow** as the single finish.
+- Clean removal: `#skinSeg` markup, `.segControl` CSS, `skin` variable + localStorage + glass→glow migration, `syncSkinSeg()`, the toggle click handler, the help-overlay "Cube style" entry, and the README bullet — all gone. `applySkin()` is now a straight single-finish applicator (still needed: `buildCube()` creates fresh materials). `clearHint()` restores the glow baseline unconditionally. Grep-verified: zero remaining `skin`/`skinSeg`/`rc.skin` references.
+
+### 2. "Admire it" removed; rainbow badge removed
+- Solved overlay is now: close X (top-right, same `ghostClose` pattern as help), "New best!" tag, "Solved" headline, sub-line, Time / Moves / Date stat cards, personal-best line, single "New scramble" action. The rainbow conic-gradient badge div + its CSS + the win-check keyframes are gone.
+- `winAdmire` handler replaced with `btnCloseWin` → `hideWin()`. The win card already had `position:relative`, so the X positions correctly.
+
+### 3. Competitive research — what famous cube sites actually prioritize
+Studied csTimer, timer.cubing.net (official cubing project), Twisty Timer-style mobile timers, and NexusTimer.
+- **The timer is the product.** csTimer's hero is a giant timer with hold-to-start spacebar; everything else (scramble panel, stats) is subordinate. Millisecond accuracy, inspection time, clear ready/running states.
+- **Fair scrambles.** Random-state scrambles (WCA-style), always visible, copyable.
+- **Stats that persist:** rolling averages ao5/ao12 (shown right under the timer on csTimer), PB tracking, per-solve history with +2/DNF penalties, session management, export.
+- **What they DON'T include:** no 3D cube toy, no style skins/toggles, no win celebrations, no solver walkthroughs, no decorative chrome. csTimer even has "hide all elements when timing" — the philosophy is subtraction.
+- **Top 3 that matter:** (1) timer accuracy + prominence, (2) fair random-state scrambles, (3) persistent stats (bests, history, averages).
+
+**Alignment for this app:** this is a casual learning cube, not a speed timer — it should not try to become csTimer. The research says REDUCE, not add: the style toggle removal was the right cut (no famous timer has one). Kept: timer (starts on first turn, stops on solve), scramble with tap-to-copy readout, personal bests + solve count. Deliberately NOT adding ao5/ao12/session stats — scope creep the research doesn't justify for a toy. The guide tray + orbit/net map are this app's differentiators (learning, not timing) and stay.
+
+### 4. Visual-fit review — done for real this time
+Hans asked point-blank whether PR #7's UI was reviewed for fit. This time every changed surface was screenshotted at 1440px desktop AND 390px mobile and read by eye:
+- main (d-main, m-main): utility bar now sound/fullscreen/help only — no gap, no overflow; cube renders in the single glow finish; move pad + dock thumb-reachable on mobile.
+- win overlay (d-win, m-win): triggered via a REAL solve (R then R' through the on-screen move pad), not a JS shortcut. Clean card, no collisions, stat cards fit in one row on 390px.
+- help overlay (d-help, m-help): "Cube style" entry gone, no overflow, readable.
+- solve tray (d-solve-tray): captured with a real scramble → Solve → tray open.
+- Shots: shots/rubiks-cube/ (d-*/m-* series for this pass).
+
+**Fit issues found and fixed:** none in the app chrome — the removals left no gaps. (Test-harness notes, not app bugs: headless CDP runs ~10x slow so scripted input needs DOM-polled waits; a stale `python3 -m http.server` from the PR #7 session was squatting on the screenshot port serving old code — killed; Solve on a solved cube correctly refuses with "Already solved. Give it a scramble first.")
+
+### Verification
+- `node tests/orbit-reference-model.test.mjs` pass; inline module syntax clean (`node --check`).
+- Live: https://builtbysai.github.io/rubiks-cube/ → 200, `skinSeg` absent from served HTML, win overlay markers (`btnCloseWin`, no `winAdmire`/`winBadge`) confirmed.
