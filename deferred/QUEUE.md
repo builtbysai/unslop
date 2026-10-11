@@ -11,7 +11,7 @@ Hans's orders before sleep: organize everything scheduled for later, then work t
 ## Queue (in order)
 
 ### 0. In-flight — verify, don't duplicate
-- **muse v3 rebuild**: the spawned rebuild never delivered (main still at v2 `3f51a1b8`, gh-pages still v1 `199c32ee` as of 2026-10-11 ~03:15 UTC). PICKED UP in the overnight shift — rebuild running, deploys to gh-pages when done.
+- **muse v3 rebuild**: ✅ DONE in overnight shift. The spawned rebuild had silently failed, so it was re-done: v3 "quiet scholarly reading room" (porcelain `#f7f8f7`, Prussian blue `#10406b` accent, catalogue rows, 10 shelves, per-note pages, search) — PR #3 merged (`2fc0b0e2`), gh-pages `567c3554`, live 200 verified, "Steal the technique" absent. NOTE: a parallel sibling session also built a v3 ("The Print Room", PR #2 `7f87f0f`) — preserved in git history, documented in verdicts/muse.md. Hans should confirm which v3 stands in the verdict round.
 - **Ghost-Ball responsive/bg/frames**: ✅ VERIFIED LANDED. PR #38 merged (`95809488`, 2026-10-11), live 200. Local-serve screenshots at 1920 and 390 confirm: no text/table collisions, per-table gallery frames (Observatory room verified), rethought star-chart background. No further work.
 
 ### 1. Rubiks-cube real UX review
