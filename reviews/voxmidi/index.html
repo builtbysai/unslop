@@ -3,255 +3,524 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VOXMIDI design review</title>
+<title>VOXMIDI design review: not slop, not yet designed</title>
+<meta name="description" content="A design critique of VOXMIDI, the browser voice-to-MIDI instrument: corrected research, annotated evidence, headless test results, an interactive concept of the proposed performance screen, and a microphone test protocol for the questions no screenshot can answer.">
+<link rel="canonical" href="https://builtbysai.com/unslop/reviews/voxmidi/">
 <style>
   :root{
-    --ink:#0b0c0e; --paper:#e9e7e1; --muted:#8f949c; --faint:#3a3e45;
-    --amber:#f0a832; --rule:#22252a; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --ink:#0a0b0d; --ink2:#101216; --paper:#ece9e2; --muted:#a9aeb7;
+    --dim:#7d838c; --amber:#f0a832; --teal:#37e0c8; --rule:#22262c;
+    --serif:Georgia,'Times New Roman',Times,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  html{background:var(--ink);}
-  body{
-    background:var(--ink); color:var(--paper);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
-    line-height:1.55; -webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:1060px; margin:0 auto; padding:0 24px;}
-  header{padding:56px 0 40px; border-bottom:1px solid var(--rule);}
-  .kicker{font-family:var(--mono); font-size:12px; letter-spacing:.14em; color:var(--amber); text-transform:uppercase;}
-  h1{font-size:clamp(34px,5.4vw,58px); line-height:1.08; letter-spacing:-0.02em; margin:18px 0 16px; font-weight:750;}
-  .lede{font-size:17px; color:var(--muted); max-width:640px;}
-  .lede strong{color:var(--paper); font-weight:600;}
-  section{padding:44px 0; border-bottom:1px solid var(--rule);}
-  .secnum{font-family:var(--mono); font-size:12px; letter-spacing:.14em; color:var(--faint); text-transform:uppercase; display:block; margin-bottom:14px;}
-  h2{font-size:clamp(24px,3.4vw,34px); letter-spacing:-0.015em; font-weight:700; margin-bottom:16px;}
-  p{margin-bottom:14px; max-width:680px;}
-  .thesis{
-    font-size:clamp(26px,4.2vw,44px); line-height:1.22; letter-spacing:-0.02em; font-weight:700;
-    max-width:800px; margin:8px 0 20px;
-  }
-  .thesis em{font-style:normal; color:var(--amber);}
-  .refgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; margin:26px 0 8px;}
-  .refgrid figure{margin:0;}
-  .refgrid .rshot{border:1px solid var(--rule); background:#000; line-height:0; overflow:hidden;}
-  .refgrid .rshot img{width:100%; height:150px; object-fit:cover; object-position:top center; display:block;}
-  .refgrid figcaption{font-family:var(--mono); font-size:12.5px; color:var(--amber); font-weight:600; letter-spacing:.08em; margin:12px 0 8px; text-transform:uppercase;}
-  .refgrid p{font-size:13.5px; color:var(--muted); margin:0; line-height:1.5;}
-  .refgrid p strong{color:var(--paper); font-weight:600;}
-  .refnote{font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:.06em; text-transform:uppercase; margin-top:14px;}
-  .rooms{display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin-top:8px;}
-  .room{padding:20px 24px 8px 0; border-top:2px solid var(--amber); margin-right:32px;}
-  .room + .room{border-top-color:var(--faint);}
-  .room h3{font-family:var(--mono); font-size:13px; letter-spacing:.14em; color:var(--paper); margin-bottom:10px;}
-  .room p{font-size:14.5px; color:var(--muted);}
-  .room p strong{color:var(--paper); font-weight:600;}
-  figure{margin:8px 0 0;}
-  .shot{position:relative; border:1px solid var(--rule); background:#000; line-height:0;}
-  .shot img{width:100%; height:auto; display:block;}
-  .pin{
-    position:absolute; width:30px; height:30px; margin:-15px 0 0 -15px; line-height:30px; text-align:center;
-    background:var(--amber); color:#0b0c0e; font-family:var(--mono); font-size:14px; font-weight:700;
-    border-radius:50%; box-shadow:0 0 0 3px rgba(240,168,50,.25);
-  }
-  figcaption{font-family:var(--mono); font-size:12px; color:var(--faint); letter-spacing:.06em; margin-top:10px; text-transform:uppercase;}
-  ol.legend{list-style:none; margin-top:18px; display:grid; grid-template-columns:1fr 1fr; gap:10px 32px; counter-reset:leg;}
-  ol.legend li{counter-increment:leg; font-size:14.5px; color:var(--muted); padding-left:34px; position:relative;}
-  ol.legend li::before{
-    content:counter(leg); position:absolute; left:0; top:1px; width:22px; height:22px; line-height:22px; text-align:center;
-    font-family:var(--mono); font-size:12px; font-weight:700; color:var(--amber);
-    border:1px solid var(--amber); border-radius:50%;
-  }
-  ol.legend li strong{color:var(--paper); font-weight:600;}
-  .verdict{margin-top:26px; font-size:16px; color:var(--muted); max-width:700px;}
-  .verdict strong{color:var(--paper);}
-  .keep{display:grid; grid-template-columns:1fr 320px; gap:40px; align-items:start; margin-top:8px;}
-  .keep ul{list-style:none;}
-  .keep li{padding:12px 0; border-top:1px solid var(--rule); font-size:15px; color:var(--muted);}
-  .keep li strong{color:var(--paper); font-weight:600;}
-  .keep .shot img{border:1px solid var(--rule);}
-  ol.fixes{list-style:none; counter-reset:fix; margin-top:8px;}
-  ol.fixes li{
-    counter-increment:fix; padding:14px 0 14px 64px; border-top:1px solid var(--rule);
-    position:relative; font-size:15px; color:var(--muted); max-width:760px;
-  }
-  ol.fixes li::before{
-    content:counter(fix,decimal-leading-zero); position:absolute; left:0; top:14px;
-    font-family:var(--mono); font-size:13px; color:var(--amber); font-weight:700;
-  }
-  ol.fixes li strong{color:var(--paper); font-weight:600;}
-  .prio{font-family:var(--mono); font-size:12px; letter-spacing:.12em; color:var(--amber); text-transform:uppercase; display:block; margin:26px 0 4px;}
-  .prio:first-of-type{margin-top:8px;}
-  footer{padding:36px 0 64px; font-size:13.5px; color:var(--faint);}
-  footer a{color:var(--muted); text-decoration:underline; text-underline-offset:3px;}
-  footer p{max-width:680px;}
-  @media (max-width:1100px){
-    .refgrid{grid-template-columns:repeat(2,1fr);}
-  }
-  @media (max-width:760px){
-    .refgrid{grid-template-columns:1fr; gap:24px;}
-    .rooms{grid-template-columns:1fr;}
-    .room{margin-right:0; padding-right:0;}
-    ol.legend{grid-template-columns:1fr;}
-    .keep{grid-template-columns:1fr;}
-    .keep .shot{max-width:340px;}
+  html{background:var(--ink); scroll-behavior:smooth;}
+  body{background:var(--ink); color:var(--paper); font-family:var(--sans);
+    line-height:1.6; -webkit-font-smoothing:antialiased;}
+  .skip{position:absolute; left:-9999px; top:0; background:var(--amber); color:#0a0b0d;
+    padding:10px 16px; font-weight:700; z-index:200;}
+  .skip:focus{left:8px; top:8px;}
+  .crumbs{border-bottom:1px solid var(--rule); font-family:var(--mono); font-size:12px;
+    letter-spacing:.08em; color:var(--dim); padding:12px 24px; text-transform:uppercase;}
+  .crumbs a{color:var(--muted); text-decoration:none;}
+  .crumbs a:hover{color:var(--amber);}
+  .layout{display:grid; grid-template-columns:220px minmax(0,1fr); max-width:1240px; margin:0 auto;}
+  .toc{position:sticky; top:0; align-self:start; padding:40px 0 40px 24px; max-height:100vh; overflow:auto;}
+  .toc p{font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--dim);
+    text-transform:uppercase; margin-bottom:12px;}
+  .toc ol{list-style:none;}
+  .toc li{margin:7px 0;}
+  .toc a{color:var(--muted); text-decoration:none; font-size:13.5px; line-height:1.4;}
+  .toc a:hover{color:var(--amber);}
+  main{min-width:0; padding:48px 48px 80px;}
+  header.review{padding:8px 0 36px; border-bottom:1px solid var(--rule); margin-bottom:8px;}
+  .kicker{font-family:var(--mono); font-size:12px; letter-spacing:.16em; color:var(--amber); text-transform:uppercase;}
+  h1{font-family:var(--serif); font-size:clamp(38px,5.6vw,64px); line-height:1.04;
+    letter-spacing:-.015em; font-weight:700; margin:16px 0 18px; max-width:16em;}
+  h1 em{font-style:italic; color:var(--amber);}
+  .sub{font-size:17px; color:var(--muted); max-width:44em;}
+  .sub strong{color:var(--paper); font-weight:600;}
+  .applinks{display:flex; flex-wrap:wrap; gap:12px; margin-top:22px;}
+  .applinks a{font-size:14px; font-weight:600; text-decoration:none; border:1px solid #33373e;
+    color:var(--paper); padding:10px 18px; border-radius:999px;}
+  .applinks a.primary{background:var(--amber); border-color:var(--amber); color:#0a0b0d;}
+  .applinks a:hover{border-color:var(--amber);}
+  a{color:var(--amber);}
+  section{padding:40px 0; border-bottom:1px solid var(--rule);}
+  .secnum{font-family:var(--mono); font-size:12px; letter-spacing:.16em; color:var(--dim);
+    text-transform:uppercase; display:block; margin-bottom:12px;}
+  h2{font-family:var(--serif); font-size:clamp(26px,3.6vw,38px); letter-spacing:-.01em;
+    font-weight:700; margin-bottom:14px; max-width:22em; line-height:1.15;}
+  h3{font-size:16px; font-weight:700; margin:26px 0 8px; color:var(--paper);}
+  p{margin-bottom:12px; max-width:46em; color:var(--muted); font-size:15.5px;}
+  p strong, li strong{color:var(--paper); font-weight:600;}
+  /* claim tiers */
+  .tier{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.12em;
+    text-transform:uppercase; padding:3px 9px; border-radius:3px; margin-right:8px; vertical-align:1px; white-space:nowrap;}
+  .tier.obs{border:1px solid var(--amber); color:var(--amber);}
+  .tier.inf{border:1px dashed var(--dim); color:var(--dim);}
+  .tier.ver{background:var(--amber); color:#0a0b0d; font-weight:700;}
+  .tierkey{display:flex; flex-wrap:wrap; gap:18px; margin:16px 0 4px; font-size:13.5px; color:var(--muted);}
+  .tierkey span{display:flex; align-items:center; gap:8px;}
+  /* research */
+  .ref{border-top:1px solid var(--rule); padding:26px 0; display:grid;
+    grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:32px; align-items:start;}
+  .ref:first-of-type{border-top:none;}
+  .ref figure{margin:0;}
+  .ref .shot{border:1px solid var(--rule); background:#000; line-height:0;}
+  .ref .shot img{width:100%; height:auto; display:block;}
+  .ref.portrait .shot{max-width:300px;}
+  .ref figcaption{font-family:var(--mono); font-size:11.5px; color:var(--dim); letter-spacing:.05em; margin-top:8px; line-height:1.5;}
+  .ref figcaption a{color:var(--muted);}
+  .ref h3{font-family:var(--serif); font-size:22px; margin:0 0 10px; font-weight:700;}
+  .ref .correction{background:var(--ink2); border-left:2px solid var(--amber); padding:12px 16px; margin:12px 0;}
+  .ref .correction p{margin:0; font-size:14.5px;}
+  .ref .oldclaim{font-size:14px; color:var(--dim);}
+  .ref .oldclaim strong{color:var(--dim);}
+  /* thesis */
+  .thesis{font-family:var(--serif); font-size:clamp(26px,4vw,42px); line-height:1.25;
+    letter-spacing:-.01em; font-weight:700; max-width:20em; margin:6px 0 18px; color:var(--paper);}
+  .thesis em{font-style:italic; color:var(--amber);}
+  /* evidence */
+  .evgrid{display:grid; grid-template-columns:minmax(0,7fr) minmax(0,5fr); gap:28px; align-items:start; margin-top:18px;}
+  figure.ev{margin:0;}
+  .shotwrap{position:relative; border:1px solid var(--rule); background:#000; line-height:0; cursor:zoom-in;}
+  .shotwrap img{width:100%; height:auto; display:block;}
+  .pin{position:absolute; width:30px; height:30px; margin:-15px 0 0 -15px; border:none; cursor:pointer;
+    background:var(--amber); color:#0a0b0d; font-family:var(--mono); font-size:14px; font-weight:700;
+    border-radius:50%; box-shadow:0 0 0 3px rgba(240,168,50,.25); line-height:30px; text-align:center; padding:0;}
+  .pin:hover{transform:scale(1.15);}
+  .pin:focus-visible{outline:2px solid #fff; outline-offset:2px;}
+  .pin[aria-expanded="true"]{background:#fff; box-shadow:0 0 0 4px rgba(255,255,255,.35);}
+  .pin.pulse{animation:pulse .8s ease 2;}
+  @keyframes pulse{50%{transform:scale(1.35);}}
+  .shotcap{font-family:var(--mono); font-size:11.5px; color:var(--dim); letter-spacing:.05em; margin-top:8px; line-height:1.5;}
+  ol.findings{list-style:none;}
+  ol.findings li{padding:13px 14px 13px 16px; border-left:2px solid var(--rule); margin-bottom:6px;
+    font-size:14.5px; color:var(--muted); cursor:pointer; border-radius:0 6px 6px 0;}
+  ol.findings li:hover{background:#14161a;}
+  ol.findings li.active{border-left-color:var(--amber); background:#15130c;}
+  ol.findings li .fnum{font-family:var(--mono); font-size:12px; color:var(--amber); font-weight:700; margin-right:8px;}
+  ol.findings li:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  .crops{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin-top:22px;}
+  .crops figure{margin:0;}
+  .crops .shotwrap{cursor:zoom-in;}
+  /* tested */
+  .test{border:1px solid var(--rule); border-radius:8px; padding:18px 20px; margin:14px 0; background:var(--ink2);}
+  .test h3{margin:0 0 8px; font-size:15px;}
+  .test p{font-size:14.5px; margin-bottom:8px;}
+  .test code{font-family:var(--mono); font-size:13px; color:var(--teal); background:#0d1114; padding:1px 6px; border-radius:4px;}
+  /* protocol */
+  ol.proto{margin:14px 0 0 0; list-style:none; counter-reset:proto;}
+  ol.proto li{counter-increment:proto; padding:12px 0 12px 52px; position:relative; border-top:1px solid var(--rule);
+    font-size:15px; color:var(--muted); max-width:48em;}
+  ol.proto li::before{content:counter(proto,decimal-leading-zero); position:absolute; left:0; top:12px;
+    font-family:var(--mono); font-size:13px; color:var(--amber); font-weight:700;}
+  /* fixes */
+  .impact{margin-top:26px;}
+  .impact > h3{font-family:var(--mono); font-size:12.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); margin-bottom:4px;}
+  .impact > p.impactwhy{font-size:14px; color:var(--dim); margin-bottom:10px;}
+  ol.fixlist{list-style:none;}
+  ol.fixlist li{padding:12px 0; border-top:1px solid var(--rule); font-size:15px; color:var(--muted); max-width:48em;}
+  ol.fixlist li .flabel{font-family:var(--mono); font-size:12px; color:var(--amber); font-weight:700; margin-right:10px;}
+  /* keep */
+  .keepgrid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:28px; margin-top:16px; align-items:start;}
+  .keepgrid ul{list-style:none;}
+  .keepgrid li{padding:11px 0; border-top:1px solid var(--rule); font-size:15px; color:var(--muted);}
+  /* question */
+  .bigq{font-family:var(--serif); font-size:clamp(24px,3.8vw,38px); line-height:1.3; color:var(--paper); max-width:22em; margin:8px 0 14px;}
+  .bigq em{font-style:italic; color:var(--amber);}
+  footer.site{padding:36px 0 70px; font-size:13.5px; color:var(--dim);}
+  footer.site p{max-width:46em; font-size:13.5px;}
+  footer.site a{color:var(--muted);}
+  /* lightbox */
+  .lb{position:fixed; inset:0; background:rgba(4,5,6,.94); display:none; z-index:100;
+    align-items:center; justify-content:center; padding:24px;}
+  .lb.open{display:flex;}
+  .lb img{max-width:96vw; max-height:92vh; object-fit:contain; border:1px solid #333;}
+  .lb .lbclose{position:absolute; top:16px; right:20px; background:var(--amber); color:#0a0b0d;
+    border:none; font-family:var(--mono); font-weight:700; font-size:14px; padding:8px 14px; border-radius:6px; cursor:pointer;}
+  .lb .lbcap{position:absolute; bottom:14px; left:0; right:0; text-align:center; color:var(--muted); font-size:13px; font-family:var(--mono);}
+  :focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  @media (max-width:1020px){
+    .layout{grid-template-columns:1fr;}
+    .toc{display:none;}
+    main{padding:36px 22px 60px;}
+    .evgrid{grid-template-columns:1fr;}
+    .ref{grid-template-columns:1fr;}
+    .ref.portrait .shot{max-width:260px;}
+    .keepgrid{grid-template-columns:1fr;}
+    .crops{grid-template-columns:1fr;}
   }
 </style>
 </head>
 <body>
-<div class="wrap">
+<a class="skip" href="#main">Skip to review content</a>
+<nav class="crumbs" aria-label="Breadcrumb"><a href="https://builtbysai.com/unslop/">unslop hub</a> / <a href="https://builtbysai.com/unslop/">reviews</a> / VOXMIDI design review</nav>
+<div class="layout">
+  <nav class="toc" aria-label="Review contents">
+    <p>Contents</p>
+    <ol>
+      <li><a href="#method">How to read this</a></li>
+      <li><a href="#research">Research, corrected</a></li>
+      <li><a href="#thesis">Thesis</a></li>
+      <li><a href="#evidence">Evidence: the studio</a></li>
+      <li><a href="#mobile">Evidence: mobile</a></li>
+      <li><a href="#tested">Tested headless</a></li>
+      <li><a href="#protocol">Microphone protocol</a></li>
+      <li><a href="#concept">Concept demo</a></li>
+      <li><a href="#fixes">Fixes by impact</a></li>
+      <li><a href="#keep">What passes</a></li>
+      <li><a href="#question">The one question</a></li>
+    </ol>
+  </nav>
+  <main id="main">
+    <header class="review">
+      <span class="kicker">VOXMIDI &middot; design review &middot; 2026-10-12, rebuilt</span>
+      <h1>Not slop. <em>Not yet designed.</em></h1>
+      <p class="sub"><strong>VOXMIDI</strong> turns humming, singing, or beatboxing into MIDI in the browser. The DSP is real and the code is honest. What it lacks is a design idea: <strong>the interface fights the performance moment it exists to serve.</strong> This review corrects its own earlier research errors, shows its evidence, and says plainly what was tested and what was not.</p>
+      <div class="applinks">
+        <a class="primary" href="https://builtbysai.com/VOXMIDI/">Open the live app</a>
+        <a href="concept/">Try the performance concept (simulated)</a>
+      </div>
+    </header>
 
-<header>
-  <span class="kicker">VOXMIDI &middot; design review &middot; 2026-10-12</span>
-  <h1>Not slop. Not yet designed.</h1>
-  <p class="lede">VOXMIDI works. Every control does what it says. What it lacks is a design idea: <strong>the interface fights the performance moment it exists to serve.</strong> This review judges it against the design guide, in order: research, thesis, evaluation. Findings only. No code changed.</p>
-</header>
+    <section id="method" aria-labelledby="method-h">
+      <span class="secnum">How to read this</span>
+      <h2 id="method-h">Claims carry their evidence tier</h2>
+      <div class="tierkey">
+        <span><span class="tier obs">Observed</span> seen in screenshots or source</span>
+        <span><span class="tier inf">Inferred</span> reasoned from evidence, labeled</span>
+        <span><span class="tier ver">Verified</span> tested headless on 2026-10-12</span>
+      </div>
+      <p><strong>Assumptions, stated once.</strong> The reviewer has no microphone in this environment, so every screenshot shows the app idle or with simulated input. Idle-state observations are labeled as such; they are not performance findings. Reference interfaces were studied from published reviews and product documentation, not from hands-on use; each cites its source. Nothing here changes VOXMIDI's code.</p>
+      <p><strong>What headless testing cannot do:</strong> establish pitch accuracy, audio latency, MIDI timing, microphone reliability, or how any of it feels with real sound. Those questions get a test protocol below instead of a verdict.</p>
+    </section>
 
-<section>
-  <span class="secnum">01 &middot; Research</span>
-  <h2>Four instruments, one lesson</h2>
-  <p style="color:var(--muted)">Studied before judging. Each reference earns its place by teaching something VOXMIDI currently ignores.</p>
-  <div class="refgrid">
-    <figure>
-      <div class="rshot"><img src="ref-dubler.jpg" alt="Vochlea Dubler 2 software, Play tab"></div>
-      <figcaption>Vochlea Dubler 2</figcaption>
-      <p><strong>Opens on Play, the performance view.</strong> Setup lives in other tabs. Teaches: performance and configuration are different rooms.</p>
-    </figure>
-    <figure>
-      <div class="rshot"><img src="ref-op1.jpg" alt="Teenage Engineering OP-1 synthesizer"></div>
-      <figcaption>Teenage Engineering OP-1</figcaption>
-      <p><strong>Power on and it is playable.</strong> No menu diving; visual semiotics over words. Teaches: the instrument is the interface.</p>
-    </figure>
-    <figure>
-      <div class="rshot"><img src="ref-push.jpg" alt="Ableton Push controller"></div>
-      <figcaption>Ableton Push</figcaption>
-      <p><strong>Head down, do not look at your monitor.</strong> A performance surface must work at a glance, in peripheral vision.</p>
-    </figure>
-    <figure>
-      <div class="rshot"><img src="ref-tonalenergy.jpg" alt="TonalEnergy tuner pitch analysis"></div>
-      <figcaption>TonalEnergy tuner</figcaption>
-      <p><strong>One question: am I on the note.</strong> Pitch feedback is one thing, shown large and fast.</p>
-    </figure>
-  </div>
-  <p class="refnote">Reference images: product press and review sources</p>
-  <p class="verdict">The common thread: <strong>every one of them separates performance from configuration. The performer looks at one thing. VOXMIDI shows seven at once.</strong></p>
-</section>
+    <section id="research" aria-labelledby="research-h">
+      <span class="secnum">Research</span>
+      <h2 id="research-h">Four references, honestly this time</h2>
+      <p>The previous version of this review used these four products to support one conclusion: separate performance from configuration. That was too neat, and in one case the evidence contradicted the claim. Each reference below shows what was claimed before, what the evidence actually shows, and the lesson that survives correction.</p>
 
-<section>
-  <span class="secnum">02 &middot; Thesis</span>
-  <p class="thesis">The voice is the instrument. <em>The screen is the mirror.</em></p>
-  <p style="color:var(--muted)">VOXMIDI is played with the mouth and watched with the eyes. Mid-performance, the singer needs exactly one answer: what note am I on, and am I in the key. Everything else is setup or capture, and neither belongs on the performance surface.</p>
-  <div class="rooms">
-    <div class="room">
-      <h3>PLAY &middot; the home</h3>
-      <p><strong>One feedback surface.</strong> The note named large, the trace drawn against the note lanes of the chosen key and scale. The keyboard lights the key you are singing. One primary action: Record. Panic stays, quiet, because a stuck note is a performance emergency.</p>
-    </div>
-    <div class="room">
-      <h3>SETUP &middot; visited once</h3>
-      <p><strong>Key, scale, mic, sensitivity, pad training.</strong> Dubler 2 puts Play first and settings in tabs; the OP-1 puts the synth first and settings on other screens. Same move.</p>
-    </div>
-    <div class="room">
-      <h3>CAPTURE &middot; a drawer</h3>
-      <p><strong>The session list and MIDI download appear after a recording exists.</strong> An empty box waiting for content is not a feature.</p>
-    </div>
-  </div>
-</section>
+      <div class="ref">
+        <figure>
+          <div class="shot"><img src="ref-dubler.jpg" alt="Vochlea Dubler 2 Play tab: drum trigger pads left, pitch section with note wheel center, vowel controls right, key and scale selectors below"></div>
+          <figcaption>Screenshot: Dubler 2 Play tab. Source: <a href="https://www.soundonsound.com/reviews/vochlea-dubler-2">Sound on Sound review</a></figcaption>
+        </figure>
+        <div>
+          <h3>Vochlea Dubler 2</h3>
+          <p class="oldclaim"><strong>Previously claimed:</strong> "Opens on Play, the performance view. Setup lives in other tabs. Performance and configuration are different rooms."</p>
+          <div class="correction"><p><span class="tier obs">Observed</span> The Play tab keeps <strong>two Sensitivity sliders, a Stickiness slider, Key and scale selectors, chord type, octave shift, eight drum trigger pads, and vowel controls</strong> visible on the performance screen. Training, chord mapping, and assignment live one tab away. Sound on Sound's review confirms the Pitch section's input level and Stickiness controls sit on the Play tab.</p></div>
+          <p><strong>The honest lesson is frequent versus infrequent, not performance versus setup.</strong> Dubler 2 keeps the controls a performer touches mid-session within reach and moves the rest one tab away. VOXMIDI's key, scale, and sensitivity selectors are legitimately mid-performance controls; a singer changes key between songs. The failure is not their presence. It is that they sit at equal weight with set-up-once choices like the mic device picker, pad training, and MIDI routing.</p>
+        </div>
+      </div>
 
-<section>
-  <span class="secnum">03 &middot; Evidence</span>
-  <h2>The studio, annotated</h2>
-  <p style="color:var(--muted)">The live studio screen, captured headless at 1280px on 2026-10-12. Every numbered marker is a finding from the evaluation.</p>
-  <figure>
-    <div class="shot">
-      <img src="studio-full.png" alt="VOXMIDI studio screen with numbered annotation markers">
-      <span class="pin" style="left:30%; top:11%;">1</span>
-      <span class="pin" style="left:86%; top:11%;">2</span>
-      <span class="pin" style="left:50%; top:25%;">3</span>
-      <span class="pin" style="left:16%; top:42%;">4</span>
-      <span class="pin" style="left:50%; top:42%;">5</span>
-      <span class="pin" style="left:84%; top:42%;">6</span>
-      <span class="pin" style="left:24%; top:2%;">7</span>
-      <span class="pin" style="left:88%; top:2%;">8</span>
-      <span class="pin" style="left:50%; top:69%;">9</span>
-    </div>
-    <figcaption>Live studio &middot; 1280px &middot; findings keyed below</figcaption>
-  </figure>
-  <ol class="legend">
-    <li><strong>The trace is the hero.</strong> Here it reads thin and clinical, boxed like everything else.</li>
-    <li><strong>The best element in the app,</strong> trapped in a card identical to all seven others.</li>
-    <li><strong>Should echo the voice</strong> by lighting the key being sung. It does not.</li>
-    <li><strong>Setup work on the performance screen:</strong> key, scale, sensitivity, mic.</li>
-    <li><strong>Half dead space.</strong> Pad training is setup work, not performance.</li>
-    <li><strong>Mic picker and MIDI notes</strong> are not the performance surface.</li>
-    <li><strong>&ldquo;Now: ...&rdquo; is a placeholder</strong> where the live note should be.</li>
-    <li><strong>One of seven pill buttons.</strong> Nine radius values. No button system.</li>
-    <li><strong>&ldquo;SESSION 0 notes&rdquo;:</strong> empty chrome shown for an empty state.</li>
-  </ol>
-  <p class="verdict"><strong>Originality:</strong> no idea under the theme. <strong>Hierarchy:</strong> flat, the central failure against the thesis. <strong>Typography:</strong> the default pro-audio costume. <strong>Subtraction:</strong> the weakest area. <strong>Honesty:</strong> passes; everything works. The redesign is a design problem, not a honesty problem.</p>
-</section>
+      <div class="ref portrait">
+        <figure>
+          <div class="shot"><img src="ref-tonalenergy.jpg" alt="TonalEnergy analysis screen: frequency graph, note readout with cents, pitch-over-time plot, tab bar with tuner, tone generator, analysis, and preferences"></div>
+          <figcaption>Screenshot: TonalEnergy analysis page. Source: <a href="https://itunes.apple.com/us/app/tonalenergy-tuner/id497716362?mt=8">App Store listing</a></figcaption>
+        </figure>
+        <div>
+          <h3>TonalEnergy tuner</h3>
+          <p class="oldclaim"><strong>Previously claimed:</strong> "One question: am I on the note. Pitch feedback is one thing, shown large and fast."</p>
+          <div class="correction"><p><span class="tier obs">Observed</span> TonalEnergy is a <strong>full practice suite</strong>: tuner, metronome, waveform and harmonic analysis, recorder, tone generator, ear training, per its feature list. The analysis screen above is dense: frequency graph, cents readout, plot controls, four tabs. It is not simple.</p></div>
+          <p><strong>The honest lesson is dominance hierarchy, not simplicity.</strong> TonalEnergy's main tuner screen leads with one dominant visual (a large animated tuner with a smiley reward on pitch) while note name, octave, and cents sit subordinate around it, and the rest of the toolkit stays one tap away. For VOXMIDI: make the primary feedback the biggest thing on screen and subordinate the rest. Do not pretend the product is one question when it ships four capabilities.</p>
+        </div>
+      </div>
 
-<section>
-  <span class="secnum">04 &middot; Mobile</span>
-  <h2>390px holds up, barely</h2>
-  <p style="color:var(--muted)">Stacks without breakage, which is to its credit. The findings are about touch and priority, not layout bugs.</p>
-  <figure>
-    <div class="shot" style="max-width:340px;">
-      <img src="studio-mobile.png" alt="VOXMIDI studio on mobile with numbered annotation markers">
-      <span class="pin" style="left:50%; top:20%;">1</span>
-      <span class="pin" style="left:50%; top:70%;">2</span>
-      <span class="pin" style="left:50%; top:90%;">3</span>
-    </div>
-    <figcaption>Live studio &middot; 390px</figcaption>
-  </figure>
-  <ol class="legend">
-    <li><strong>The trace names no note</strong> and draws no lanes.</li>
-    <li><strong>15 keys at about 26px each.</strong> Not tappable.</li>
-    <li><strong>Settings stack below the fold</strong> with no end.</li>
-  </ol>
-</section>
+      <div class="ref">
+        <figure>
+          <div class="shot"><img src="ref-op1.jpg" alt="Teenage Engineering OP-1 hardware: color-coded knobs, small OLED screen, piano-style keys"></div>
+          <figcaption>Photo: OP-1 hardware. Source: <a href="https://en.wikipedia.org/wiki/Teenage_Engineering_OP-1">Wikipedia: Teenage Engineering OP-1</a></figcaption>
+        </figure>
+        <div>
+          <h3>Teenage Engineering OP-1</h3>
+          <p class="oldclaim"><strong>Previously claimed:</strong> "Power on and it is playable. The instrument is the interface."</p>
+          <div class="correction"><p><span class="tier obs">Observed</span> The OP-1 is <strong>hardware</strong>: four physical knobs that act as macro controllers per synth engine, tactile keys, and a tiny OLED you barely read. Its screen can be small because hands know where they are without looking. Latency is zero because it is a circuit, not a browser tab.</p></div>
+          <p><strong>The lesson inverts for a screen instrument.</strong> What transfers: decide-for-the-user defaults (four knobs means four parameters, no more), visual metaphor over labels, constraints that accelerate decisions. What does not: minimizing screen attention. The OP-1 avoids the screen because hands are busy; VOXMIDI's screen is the <em>only</em> feedback channel. It must earn the singer's eyes, not avoid them. The previous review had this backwards.</p>
+        </div>
+      </div>
 
-<section>
-  <span class="secnum">05 &middot; What passes</span>
-  <h2>Keep this</h2>
-  <div class="keep">
-    <ul>
-      <li><strong>Microcopy worth keeping.</strong> &ldquo;Panic kills all sound instantly if a note sticks.&rdquo; &ldquo;Locked on. Nice.&rdquo; Plain, human, specific.</li>
-      <li><strong>The privacy footer.</strong> &ldquo;Audio never leaves your device.&rdquo; A real differentiator, well placed.</li>
-      <li><strong>Four-step onboarding,</strong> every step skippable, with satisfying lock-on feedback on the hum test.</li>
-      <li><strong>The help modal</strong> is real documentation, not filler.</li>
-      <li><strong>The note readout</strong> is the seed of the thesis. Big, instant, the one thing that already behaves like a mirror.</li>
-    </ul>
-    <div class="shot"><img src="onboarding.png" alt="VOXMIDI onboarding welcome screen"></div>
-  </div>
-</section>
+      <div class="ref">
+        <figure>
+          <div class="shot"><img src="ref-push.jpg" alt="Ableton Push hardware: 8 by 8 pad grid with scale notes lit, display strip above"></div>
+          <figcaption>Photo: Ableton Push. Source: <a href="https://www.bajaao.com/blogs/blog/how-to-compose-melodies-and-chords-with-ableton-push">Bajaao: composing with Push</a></figcaption>
+        </figure>
+        <div>
+          <h3>Ableton Push</h3>
+          <p class="oldclaim"><strong>Previously claimed:</strong> "Head down, do not look at your monitor. A performance surface must work at a glance."</p>
+          <div class="correction"><p><span class="tier obs">Observed</span> Push's "don't look at the monitor" works because <strong>Push has its own display and 64 tactile pads</strong>: attention moves to hardware, not away from feedback. In Key mode the pads show only in-scale notes (root highlighted); the Scale button changes key and scale.</p></div>
+          <p><strong>What transfers is the constraint, not the glanceability.</strong> In Key mode makes a novice musical without theory by removing wrong notes. VOXMIDI already has "Stay in key" but never visualizes it; drawing the trace against scale lanes is this lesson applied. What does not transfer: the glance claim. A singer watching a screen for pitch feedback needs <em>sustained</em> attention, which is a harder design problem than peripheral glances, and the honest version of this review admits it.</p>
+        </div>
+      </div>
+    </section>
 
-<section>
-  <span class="secnum">06 &middot; Fix list</span>
-  <h2>In thesis order</h2>
-  <span class="prio">P0 &middot; thesis level</span>
-  <ol class="fixes">
-    <li><strong>Split the studio into Play and Setup.</strong> Play shows the merged feedback surface, the live keyboard, Record, and a quiet Panic. Everything else moves.</li>
-    <li><strong>Merge the note readout and the trace into one feedback instrument.</strong> The trace drawn against the note lanes of the selected key and scale, the current note named large at the trace head. This is the mirror. The separate G4 card disappears into it.</li>
-    <li><strong>One button language, two radii maximum.</strong> Record keeps the primary treatment. Everything else shares one quieter style.</li>
-  </ol>
-  <span class="prio">P1 &middot; the thesis, applied outward</span>
-  <ol class="fixes">
-    <li><strong>Capture becomes a drawer.</strong> Session list and Download MIDI appear only after a recording exists.</li>
-    <li><strong>The keyboard becomes the visual echo of the voice.</strong> Highlight the key being sung. On mobile, fold octaves; 15 keys at 26px is not tappable.</li>
-    <li><strong>Drum pads stay on Play as playable pads.</strong> Training them is Setup work and moves there with the wizard.</li>
-  </ol>
-  <span class="prio">P2 &middot; finish work</span>
-  <ol class="fixes">
-    <li><strong>Typography:</strong> one display face for the note, one quiet face for labels. Retire the letterspaced-caps default.</li>
-    <li><strong>One name for input gain.</strong> Onboarding says &ldquo;raise the input gain&rdquo;; the studio control says &ldquo;Sensitivity&rdquo;.</li>
-    <li><strong>Real-mic validation.</strong> Trace legibility while actually singing, and the populated session list. Headless cannot do this.</li>
-  </ol>
-</section>
+    <section id="thesis" aria-labelledby="thesis-h">
+      <span class="secnum">Thesis, revised</span>
+      <h2 id="thesis-h" class="sr-only" style="position:absolute;left:-9999px;">Revised design thesis</h2>
+      <p class="thesis">The voice is the instrument. <em>The screen must earn the singer's eyes.</em></p>
+      <p>VOXMIDI is played with the mouth and watched with the eyes, and the screen is the only feedback channel it has. Mid-performance the singer needs one dominant answer: what note am I on, and am I in the key. The corrected research reshapes the old three-rooms idea into something defensible:</p>
+      <p><strong>One dominant feedback surface.</strong> The note readout and the pitch trace become a single instrument, the trace drawn against the lanes of the chosen key and scale. This is the mirror; it is the biggest thing on screen because it is the thing being watched.</p>
+      <p><strong>Frequent controls stay, subordinate.</strong> Key, scale, and sensitivity are mid-performance controls. Dubler 2's actual pattern keeps them on the performance screen but visually quieter than the feedback. Set-up-once choices (mic device, pad training, MIDI routing) move out.</p>
+      <p><strong>The keyboard echoes.</strong> It lights the key being sung. It is the visual echo of the voice, not a second instrument competing for space.</p>
+    </section>
 
-<footer>
-  <p>Method note: a slop-checker pass on the same evidence scored about 12 percent, entirely from visual-structure tells; the copy audit was clean. It stays a footnote because the design guide, not the meter, is the method. Evidence captured headless on 2026-10-12; Hans&rsquo;s real-device and real-mic verdict is the gate.</p>
-  <p style="margin-top:12px;">Full text review: <a href="https://github.com/builtbysai/unslop/blob/main/reviews/VOXMIDI-design-guide-review.md">VOXMIDI-design-guide-review.md</a> &middot; Live app: <a href="https://builtbysai.com/VOXMIDI/">builtbysai.com/VOXMIDI</a></p>
-</footer>
+    <section id="evidence" aria-labelledby="evidence-h">
+      <span class="secnum">Evidence</span>
+      <h2 id="evidence-h">The studio, annotated</h2>
+      <p>Live studio captured headless at 1280px, idle (no microphone in this environment). Select a marker to highlight its finding; select a finding to pulse its marker. Select any image to view it at native resolution.</p>
+      <div class="evgrid">
+        <figure class="ev">
+          <div class="shotwrap" data-full="studio-full.png" tabindex="0" role="button" aria-label="Open full studio screenshot at native resolution">
+            <img src="studio-full.png" alt="VOXMIDI studio screen: pitch trace panel, note readout card, piano keyboard, and three settings cards">
+            <button class="pin" style="left:35%; top:16%;" data-f="f1" aria-expanded="false" aria-label="Finding 1: blank trace panel">1</button>
+            <button class="pin" style="left:88%; top:16%;" data-f="f2" aria-expanded="false" aria-label="Finding 2: note readout trapped in a card">2</button>
+            <button class="pin" style="left:50%; top:38%;" data-f="f3" aria-expanded="false" aria-label="Finding 3: keyboard prominence">3</button>
+            <button class="pin" style="left:16%; top:63%;" data-f="f4" aria-expanded="false" aria-label="Finding 4: setup on the performance screen">4</button>
+            <button class="pin" style="left:50%; top:63%;" data-f="f5" aria-expanded="false" aria-label="Finding 5: drums card dead space">5</button>
+            <button class="pin" style="left:84%; top:63%;" data-f="f6" aria-expanded="false" aria-label="Finding 6: output card is configuration">6</button>
+            <button class="pin" style="left:24%; top:2.5%;" data-f="f7" aria-expanded="false" aria-label="Finding 7: Now placeholder">7</button>
+            <button class="pin" style="left:90%; top:2.5%;" data-f="f8" aria-expanded="false" aria-label="Finding 8: pill buttons">8</button>
+            <button class="pin" style="left:50%; top:90%;" data-f="f9" aria-expanded="false" aria-label="Finding 9: empty session chrome">9</button>
+          </div>
+          <figcaption class="shotcap">Live studio &middot; 1280px &middot; idle, no microphone &middot; select to enlarge</figcaption>
+        </figure>
+        <ol class="findings" aria-label="Annotated findings">
+          <li id="f1" tabindex="0"><span class="fnum">1</span><span class="tier obs">Observed</span><strong>The hero is blank.</strong> The trace panel is the largest surface on screen. Idle, it shows a flat line in an empty box. A mirror with nothing in it. <a href="#concept">The concept</a> shows what this surface is for.</li>
+          <li id="f2" tabindex="0"><span class="fnum">2</span><span class="tier obs">Observed</span><strong>The best element, trapped.</strong> The note readout (G4, +36 ct) is the most alive thing in the app, sitting in a card identical to the other six.</li>
+          <li id="f3" tabindex="0"><span class="fnum">3</span><span class="tier inf">Inferred</span><strong>Prominence misstates role.</strong> The keyboard takes major vertical space as an audition tool, but never echoes the sung note. It reads as a second instrument competing with the voice.</li>
+          <li id="f4" tabindex="0"><span class="fnum">4</span><span class="tier obs">Observed</span><strong>Setup at full weight.</strong> Key, scale, pitch bend, octave, sensitivity: all visible at once, all the same visual weight as the feedback.</li>
+          <li id="f5" tabindex="0"><span class="fnum">5</span><span class="tier obs">Observed</span><strong>Half dead space.</strong> The DRUMS card holds three pads, a training button, and empty air. Pad training is setup work wearing a performance costume.</li>
+          <li id="f6" tabindex="0"><span class="fnum">6</span><span class="tier obs">Observed</span><strong>Configuration, not performance.</strong> The OUTPUT card (mic picker, MIDI routing notes) answers questions nobody asks mid-song.</li>
+          <li id="f7" tabindex="0"><span class="fnum">7</span><span class="tier obs">Observed</span><strong>A placeholder ships visible.</strong> "Now: ..." sits in the top bar where the live note should be.</li>
+          <li id="f8" tabindex="0"><span class="fnum">8</span><span class="tier inf">Inferred</span><strong>One visual language for every action.</strong> Seven pill buttons; Record (primary) competes with Clear (tertiary). Shape and emphasis do not communicate importance.</li>
+          <li id="f9" tabindex="0"><span class="fnum">9</span><span class="tier obs">Observed</span><strong>Empty chrome for an empty state.</strong> "SESSION 0 notes" with a vacant box. An empty box waiting for content is not a feature.</li>
+        </ol>
+      </div>
+      <div class="crops">
+        <figure>
+          <div class="shotwrap" data-full="detail/trace-panel.png" tabindex="0" role="button" aria-label="Open trace panel detail at native resolution">
+            <img src="detail/trace-panel.png" alt="Detail: the pitch trace panel showing a flat line in an empty dark box">
+          </div>
+          <figcaption class="shotcap">Detail: the trace panel, idle. This is the largest surface in the app.</figcaption>
+        </figure>
+        <figure>
+          <div class="shotwrap" data-full="detail/note-card.png" tabindex="0" role="button" aria-label="Open note card detail at native resolution">
+            <img src="detail/note-card.png" alt="Detail: the note readout card showing G4 with cents deviation">
+          </div>
+          <figcaption class="shotcap">Detail: the note readout. The seed of the thesis, boxed like everything else.</figcaption>
+        </figure>
+      </div>
+    </section>
 
+    <section id="mobile" aria-labelledby="mobile-h">
+      <span class="secnum">Evidence: mobile</span>
+      <h2 id="mobile-h">390px holds up structurally, fails evidentially</h2>
+      <p>Nothing breaks at 390px, which is to the app's credit. But the full-page screenshot shrinks interface labels to a few pixels, so the crops below carry the actual evidence.</p>
+      <div class="crops">
+        <figure>
+          <div class="shotwrap" data-full="detail/m-trace.png" tabindex="0" role="button" aria-label="Open mobile trace detail at native resolution">
+            <img src="detail/m-trace.png" alt="Detail: mobile trace panel, a large empty dark rectangle">
+          </div>
+          <figcaption class="shotcap"><span class="tier obs">Observed</span> The trace becomes a large dead rectangle. It names no note and draws no lanes.</figcaption>
+        </figure>
+        <figure>
+          <div class="shotwrap" data-full="detail/m-keyboard.png" tabindex="0" role="button" aria-label="Open mobile keyboard detail at native resolution">
+            <img src="detail/m-keyboard.png" alt="Detail: mobile piano keyboard, fifteen keys crammed with tiny labels">
+          </div>
+          <figcaption class="shotcap"><span class="tier obs">Observed</span> Fifteen keys at about 26px each. Labels are barely legible; targets are not comfortably tappable.</figcaption>
+        </figure>
+      </div>
+      <p style="margin-top:18px;"><span class="tier obs">Observed</span> <strong>"Now: ..." wraps broken</strong> in the top bar at 390px ("Now:" on one line, "..." below). <span class="tier inf">Inferred</span> <strong>The settings stack below the fold with no visual end;</strong> on a phone the performance screen never resolves into a finished view.</p>
+    </section>
+
+    <section id="tested" aria-labelledby="tested-h">
+      <span class="secnum">Tested</span>
+      <h2 id="tested-h">What headless testing actually verified</h2>
+      <p>Run 2026-10-12 against a local copy of the live build, driving the real UI through Chrome DevTools Protocol: tab walks, keyboard activation, record state transitions, and source inspection. The previous review claimed "everything works" from screenshots alone. These are the claims that survive contact with the app.</p>
+
+      <div class="test">
+        <h3><span class="tier ver">Verified</span> Keyboard walk: 20 stops, one exclusion</h3>
+        <p>Tabbing through the studio reaches every control: help, key and scale selects, quantize toggle, pitch bend, octave, sensitivity slider, velocity and drum toggles, three drum pads, pad training, mic enable, synth toggle, Panic, Clear, and Record. Arrow keys change the key select without interrupting state. <strong>The 24 piano keys are not in the tab order at all.</strong> They are <code>&lt;div&gt;</code> elements with pointer-only handlers, and <code>#keyboard</code> carries <code>aria-hidden="true"</code>: the keyboard is invisible to keyboards and to screen readers alike.</p>
+      </div>
+      <div class="test">
+        <h3><span class="tier ver">Verified</span> No visible focus indicator</h3>
+        <p>The stylesheet contains no <code>:focus</code> rules. A keyboard user can operate the controls but can never see where they are. This fails WCAG 2.4.7 (focus visible).</p>
+      </div>
+      <div class="test">
+        <h3><span class="tier ver">Verified</span> Record state machine is sane</h3>
+        <p>Space on the focused Record button toggles the label to Stop and the count to "Recording..."; stopping restores it. With zero notes captured, Download MIDI stays disabled: the empty case is handled, not left as a dead button.</p>
+      </div>
+      <div class="test">
+        <h3><span class="tier ver">Verified</span> No-MIDI path degrades gracefully (code)</h3>
+        <p>The engine feature-detects <code>requestMIDIAccess</code>. Without it, the MIDI selector offers "Built-in synth only" with the copy "MIDI output needs Chrome, Edge, or Firefox. Your built-in synth is ready either way." The fallback was read in source, not just in the screenshot.</p>
+      </div>
+      <div class="test">
+        <h3><span class="tier obs">Observed</span> What no headless test can touch</h3>
+        <p>Pitch accuracy, audio latency, MIDI timing, microphone reliability, distinguishing silence from poor detection, drum trigger feel, and the populated session list. The protocol below is for a real microphone.</p>
+      </div>
+    </section>
+
+    <section id="protocol" aria-labelledby="protocol-h">
+      <span class="secnum">Microphone protocol</span>
+      <h2 id="protocol-h">Eight tests for a real mic</h2>
+      <p>These are the questions screenshots cannot answer. Each takes under a minute. Do them in order; stop at the first one that fails and that is the finding.</p>
+      <ol class="proto">
+        <li><strong>Steady tone.</strong> Hum A4 for five seconds. Expect A4 within 10 cents and a flat trace on the A lane. If the readout flutters between notes, the tracker not the UI is the problem.</li>
+        <li><strong>Slow glide.</strong> Slide from C4 to C5 over four seconds. The trace should follow continuously and note names should update without flickering back and forth.</li>
+        <li><strong>Scale run.</strong> Sing a C major scale with Stay in key on. The session list should contain no out-of-scale notes.</li>
+        <li><strong>Beatbox.</strong> Do eight bars of kick, snare, hat. Each pad should trigger on the right sound and ignore the others.</li>
+        <li><strong>Record and export.</strong> Record thirty seconds of melody, download the .mid, open it in a DAW. Check the timing against what you sang.</li>
+        <li><strong>Latency feel.</strong> Clap once and watch the trace. How long before it reacts? Under 50ms feels instant; over 150ms feels broken.</li>
+        <li><strong>Quiet voice.</strong> Hum at arm's length. Where does detection give up, and does the sensitivity slider move that point in a way you can feel?</li>
+        <li><strong>Noise.</strong> TV on in the background. False triggers? Which sounds confuse it?</li>
+      </ol>
+    </section>
+
+    <section id="concept" aria-labelledby="concept-h">
+      <span class="secnum">Demonstration</span>
+      <h2 id="concept-h">The proposed instrument, running</h2>
+      <p>A review should not only describe the better experience; it should show it. This is an interactive mock of the merged performance screen from the thesis: one feedback surface (note readout plus trace against scale lanes), the keyboard echoing the sung key, and the frequent controls (key, scale, sensitivity) kept subordinate on the performance screen. <strong>Data is simulated; there is no microphone involved.</strong> It proves the layout idea, not the DSP.</p>
+      <div class="applinks"><a class="primary" href="concept/">Open the concept demo</a></div>
+    </section>
+
+    <section id="fixes" aria-labelledby="fixes-h">
+      <span class="secnum">Fixes</span>
+      <h2 id="fixes-h">Ordered by impact, not by taste</h2>
+
+      <div class="impact">
+        <h3>Will break the product</h3>
+        <p class="impactwhy">These exclude users. Non-negotiable.</p>
+        <ol class="fixlist">
+          <li><span class="flabel">F1</span><strong>Make the piano keyboard operable.</strong> Rebuild the 24 keys as real buttons, remove <code>aria-hidden</code>, give each an accessible name. A pointer-only, AT-invisible keyboard on a music app is a hard failure. <span class="tier ver">Verified</span></li>
+          <li><span class="flabel">F2</span><strong>Add visible focus styles.</strong> <code>:focus-visible</code> treatment for every interactive element. Keyboard users currently fly blind. <span class="tier ver">Verified</span></li>
+        </ol>
+      </div>
+
+      <div class="impact">
+        <h3>Will weaken the product</h3>
+        <p class="impactwhy">These will not cause failure, but they keep the app mediocre instead of good.</p>
+        <ol class="fixlist">
+          <li><span class="flabel">F3</span><strong>Merge the note readout and the trace into one dominant feedback instrument.</strong> Trace against the lanes of the selected key and scale, note named large at the trace head. The separate G4 card disappears into it. <a href="concept/">Demonstrated above.</a> <span class="tier inf">Inferred</span></li>
+          <li><span class="flabel">F4</span><strong>Subordinate, do not banish, the frequent controls.</strong> Key, scale, and sensitivity stay on the performance screen, visually quieter than the feedback. Mic device, pad training, and MIDI routing move to Setup. This is what Dubler 2 actually does. <span class="tier obs">Observed</span></li>
+          <li><span class="flabel">F5</span><strong>Design the empty states or hide the chrome.</strong> "Now: ..." becomes the live note or goes away. The session box appears after the first recording, not before. <span class="tier obs">Observed</span></li>
+          <li><span class="flabel">F6</span><strong>One button language.</strong> Record keeps the primary treatment; everything else shares one quieter style. Shape and emphasis should communicate importance. <span class="tier inf">Inferred</span></li>
+          <li><span class="flabel">F7</span><strong>Fix the mobile keyboard.</strong> Fold octaves or scroll horizontally; fifteen keys at 26px are not comfortably tappable. <span class="tier obs">Observed</span></li>
+          <li><span class="flabel">F8</span><strong>Retire the letterspaced-caps costume.</strong> One display face for the note, one quiet face for labels. <span class="tier inf">Inferred</span></li>
+        </ol>
+      </div>
+
+      <div class="impact">
+        <h3>Worth considering</h3>
+        <p class="impactwhy">Genuinely optional. Honest about being preference-adjacent.</p>
+        <ol class="fixlist">
+          <li><span class="flabel">F9</span><strong>Visualize "Stay in key."</strong> The Push lesson: light the scale lanes so the constraint is visible, not just a toggle. <span class="tier inf">Inferred</span></li>
+          <li><span class="flabel">F10</span><strong>One name for input gain.</strong> Onboarding says "raise the input gain"; the studio control says "Sensitivity". <span class="tier obs">Observed</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="keep" aria-labelledby="keep-h">
+      <span class="secnum">What passes</span>
+      <h2 id="keep-h">Keep this</h2>
+      <div class="keepgrid">
+        <ul>
+          <li><strong>Microcopy.</strong> "Panic kills all sound instantly if a note sticks." "Locked on. Nice." Plain, human, specific.</li>
+          <li><strong>The privacy footer.</strong> "Audio never leaves your device." A real differentiator, well placed.</li>
+          <li><strong>Four-step onboarding,</strong> every step skippable, with satisfying lock-on feedback on the hum test.</li>
+          <li><strong>The help modal</strong> is real documentation, not filler.</li>
+          <li><strong>The note readout</strong> is the seed of the thesis: big, instant, the one thing that already behaves like a mirror.</li>
+          <li><strong>The no-MIDI fallback</strong> degrades gracefully with honest copy instead of a dead end.</li>
+        </ul>
+        <figure>
+          <div class="shotwrap" data-full="detail/onboarding-modal.png" tabindex="0" role="button" aria-label="Open onboarding detail at native resolution">
+            <img src="detail/onboarding-modal.png" alt="Detail: the VOXMIDI onboarding welcome modal">
+          </div>
+          <figcaption class="shotcap">Detail: onboarding modal, cropped to readable size. The best screen in the app.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="question" aria-labelledby="question-h">
+      <span class="secnum">The one question</span>
+      <h2 id="question-h" class="sr-only" style="position:absolute;left:-9999px;">The one question</h2>
+      <p class="bigq">What does the screen tell a singer mid-phrase <em>that their ears don't already tell them?</em></p>
+      <p>If the answer is nothing, the mirror is decoration. Every fix above is a way of giving that question a better answer.</p>
+    </section>
+
+    <footer class="site">
+      <p>Method: the permanent design standard, applied in order. Research first (with corrections where the previous review overstated), thesis second, evaluation third. Evidence captured headless 2026-10-12; interaction tests driven through CDP against the live build. Findings only; no VOXMIDI code changed. The previous version of this review is superseded.</p>
+      <p style="margin-top:10px;">Sources: <a href="https://www.soundonsound.com/reviews/vochlea-dubler-2">Sound on Sound: Dubler 2</a> &middot; <a href="https://itunes.apple.com/us/app/tonalenergy-tuner/id497716362?mt=8">TonalEnergy App Store listing</a> &middot; <a href="https://en.wikipedia.org/wiki/Teenage_Engineering_OP-1">Wikipedia: OP-1</a> &middot; <a href="https://www.bajaao.com/blogs/blog/how-to-compose-melodies-and-chords-with-ableton-push">Bajaao: Push</a> &middot; <a href="https://github.com/builtbysai/VOXMIDI">VOXMIDI repo</a> &middot; <a href="https://builtbysai.com/VOXMIDI/">Live app</a></p>
+    </footer>
+  </main>
 </div>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="lbclose" id="lbclose">Close (Esc)</button>
+  <img id="lbimg" src="" alt="">
+  <div class="lbcap" id="lbcap"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* pin <-> finding interaction */
+  var pins = document.querySelectorAll('.pin');
+  var lastFocus = null;
+  function clearActive(){
+    document.querySelectorAll('ol.findings li.active').forEach(function(li){ li.classList.remove('active'); });
+    pins.forEach(function(p){ p.setAttribute('aria-expanded','false'); });
+  }
+  function activate(id, fromPin){
+    clearActive();
+    var li = document.getElementById(id);
+    if (!li) return;
+    li.classList.add('active');
+    var pin = document.querySelector('.pin[data-f="'+id+'"]');
+    if (pin) {
+      pin.setAttribute('aria-expanded','true');
+      if (!fromPin) { pin.classList.remove('pulse'); void pin.offsetWidth; pin.classList.add('pulse'); }
+    }
+  }
+  pins.forEach(function(pin){
+    pin.addEventListener('click', function(e){ e.stopPropagation(); activate(pin.getAttribute('data-f'), true); });
+  });
+  document.querySelectorAll('ol.findings li').forEach(function(li){
+    li.addEventListener('click', function(){ activate(li.id, false); });
+    li.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(li.id, false); }
+    });
+  });
+
+  /* lightbox */
+  var lb = document.getElementById('lb');
+  var lbimg = document.getElementById('lbimg');
+  var lbcap = document.getElementById('lbcap');
+  var lbclose = document.getElementById('lbclose');
+  function openLb(src, cap, alt){
+    lastFocus = document.activeElement;
+    lbimg.src = src; lbimg.alt = alt || '';
+    lbcap.textContent = cap || '';
+    lb.classList.add('open');
+    lbclose.focus();
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLb(){
+    lb.classList.remove('open');
+    lbimg.src = '';
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  document.querySelectorAll('.shotwrap').forEach(function(w){
+    var go = function(e){ e.stopPropagation(); openLb(w.getAttribute('data-full'), w.parentElement.querySelector('.shotcap').textContent, w.querySelector('img').alt); };
+    w.addEventListener('click', go);
+    w.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(e); } });
+  });
+  lbclose.addEventListener('click', closeLb);
+  lb.addEventListener('click', function(e){ if (e.target === lb) closeLb(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && lb.classList.contains('open')) closeLb(); });
+})();
+</script>
 </body>
 </html>

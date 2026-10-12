@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VOXMIDI performance concept (simulated)</title>
+<meta name="description" content="Interactive concept mock of a merged VOXMIDI performance screen: note readout, pitch trace against scale lanes, keyboard echo. Simulated data, no microphone.">
+<style>
+  :root{
+    --ink:#0a0b0d; --panel:#121418; --paper:#ece9e2; --muted:#a9aeb7;
+    --faint:#6b7078; --amber:#f0a832; --teal:#37e0c8; --lane:#1d2126;
+    --serif:Georgia,'Times New Roman',serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{background:var(--ink);}
+  body{background:var(--ink); color:var(--paper);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; min-height:100vh; display:flex; flex-direction:column;}
+  .topbar{display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #1e2228;}
+  .badge{font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:#0a0b0d;
+    background:var(--amber); padding:4px 10px; border-radius:3px; font-weight:700;}
+  .simnote{font-family:var(--mono); font-size:12px; color:var(--faint); letter-spacing:.06em;}
+  .topbar a{margin-left:auto; font-size:13px; color:var(--muted);}
+  main{flex:1; display:flex; flex-direction:column; max-width:1180px; width:100%; margin:0 auto; padding:26px 20px 40px;}
+  .instrument{position:relative; background:var(--panel); border:1px solid #22262d; border-radius:10px; overflow:hidden;}
+  .readout{display:flex; align-items:baseline; gap:14px; padding:22px 26px 6px;}
+  #noteName{font-family:var(--serif); font-size:clamp(64px,10vw,118px); line-height:1; font-weight:700; letter-spacing:-.02em;}
+  #noteOct{font-family:var(--serif); font-size:clamp(28px,4vw,44px); color:var(--faint);}
+  #cents{margin-left:auto; font-family:var(--mono); font-size:14px; color:var(--muted); text-align:right;}
+  #cents b{color:var(--amber); font-weight:600;}
+  #trace{display:block; width:100%; height:300px;}
+  .kbwrap{border-top:1px solid #22262d; padding:14px 26px 20px;}
+  .kb{display:flex; gap:3px; height:120px;}
+  .k{flex:1; border-radius:0 0 5px 5px; background:#e8e6e1; position:relative; transition:background .08s;}
+  .k.black{background:#2a2e35; flex:.62; height:62%; z-index:1; margin:0 -2.5%;}
+  .k.lit{background:var(--amber);}
+  .k.black.lit{background:var(--amber);}
+  .k .kl{position:absolute; bottom:6px; left:0; right:0; text-align:center; font-size:10px; color:#8a8f98; font-family:var(--mono);}
+  .k.black .kl{display:none;}
+  .controls{display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center; margin-top:18px;
+    padding:16px 4px; border-top:1px solid #1e2228;}
+  .ctl{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted);}
+  .ctl select{background:#16191e; color:var(--paper); border:1px solid #2a2e35; border-radius:6px; padding:7px 10px; font-size:13px;}
+  .ctl input[type=range]{accent-color:var(--amber); width:130px;}
+  .btn{font:inherit; font-size:14px; font-weight:600; border-radius:999px; padding:10px 22px; cursor:pointer; border:1px solid #2a2e35; background:#16191e; color:var(--paper);}
+  .btn.primary{background:var(--amber); border-color:var(--amber); color:#0a0b0d;}
+  .btn.quiet{background:transparent;}
+  .btn:focus-visible, select:focus-visible, input:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  .session{margin-top:6px; font-family:var(--mono); font-size:13px; color:var(--muted); min-height:24px;}
+  .session b{color:var(--amber);}
+  .foot{margin-top:26px; font-size:13px; color:var(--faint); max-width:720px; line-height:1.6;}
+  .foot strong{color:var(--muted);}
+  @media (max-width:640px){ #trace{height:220px;} .kb{height:92px;} }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="badge">CONCEPT</span>
+  <span class="simnote">SIMULATED DATA &middot; NO MICROPHONE</span>
+  <a href="../">Back to the review</a>
+</div>
+<main>
+  <div class="instrument" aria-label="Concept performance instrument with simulated voice data">
+    <div class="readout">
+      <span id="noteName">A</span><span id="noteOct">4</span>
+      <span id="cents">live pitch<br><b id="centsVal">+0 ct</b></span>
+    </div>
+    <canvas id="trace" aria-label="Simulated pitch trace drawn against scale lanes"></canvas>
+    <div class="kbwrap"><div class="kb" id="kb" aria-hidden="true"></div></div>
+  </div>
+  <div class="controls">
+    <button class="btn primary" id="btnSim">Pause simulation</button>
+    <label class="ctl">Key
+      <select id="keySel">
+        <option>C</option><option>C#</option><option>D</option><option>D#</option>
+        <option>E</option><option>F</option><option>F#</option><option>G</option>
+        <option>G#</option><option>A</option><option>A#</option><option>B</option>
+      </select>
+    </label>
+    <label class="ctl">Scale
+      <select id="scaleSel">
+        <option value="0,2,4,5,7,9,11">Major</option>
+        <option value="0,2,3,5,7,8,10">Natural minor</option>
+        <option value="0,2,4,7,9">Major pentatonic</option>
+        <option value="0,3,5,6,7,10">Blues</option>
+        <option value="0,2,4,5,7,9,10">Mixolydian</option>
+      </select>
+    </label>
+    <label class="ctl">Sensitivity <input type="range" id="sens" min="1" max="100" value="45"></label>
+    <button class="btn" id="btnRec">Record</button>
+    <button class="btn quiet" id="btnPanic">Panic</button>
+  </div>
+  <div class="session" id="sessionLine" aria-live="polite">Session: <b>0</b> notes captured (simulated)</div>
+  <p class="foot"><strong>What this proposes:</strong> the note readout and the pitch trace are one instrument, not two cards. The trace is drawn against the lanes of the chosen key and scale, so you see where you are and where you can go. The keyboard echoes the sung key. Key, scale, and sensitivity stay on the performance screen because a singer touches them mid-session; everything else (mic device, pad training, MIDI routing) would live in Setup. <strong>What it is not:</strong> a redesign of VOXMIDI, and nothing here proves the DSP works. That needs a real microphone.</p>
+</main>
+<script>
+(function(){
+  "use strict";
+  var NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  var canvas = document.getElementById('trace');
+  var ctx = canvas.getContext('2d');
+  var kb = document.getElementById('kb');
+  var noteName = document.getElementById('noteName');
+  var noteOct = document.getElementById('noteOct');
+  var centsVal = document.getElementById('centsVal');
+  var keySel = document.getElementById('keySel');
+  var scaleSel = document.getElementById('scaleSel');
+  var sens = document.getElementById('sens');
+  var btnSim = document.getElementById('btnSim');
+  var btnRec = document.getElementById('btnRec');
+  var btnPanic = document.getElementById('btnPanic');
+  var sessionLine = document.getElementById('sessionLine');
+
+  // Build two-octave keyboard C4..B5
+  var keys = [];
+  for (var m = 60; m <= 83; m++) {
+    (function(midi){
+      var pc = midi % 12;
+      var black = [1,3,6,8,10].indexOf(pc) >= 0;
+      var d = document.createElement('div');
+      d.className = 'k' + (black ? ' black' : '');
+      if (!black) { var s = document.createElement('span'); s.className = 'kl'; s.textContent = NAMES[pc]; d.appendChild(s); }
+      kb.appendChild(d);
+      keys.push({midi: midi, el: d});
+    })(m);
+  }
+  function lightKey(midi){
+    keys.forEach(function(k){ k.el.classList.toggle('lit', k.midi === midi); });
+  }
+
+  function scaleSet(){
+    var root = keySel.selectedIndex;
+    return scaleSel.value.split(',').map(function(x){ return (root + (+x)) % 12; });
+  }
+
+  // Simulation state
+  var running = true, recording = false, recCount = 0;
+  var trace = [];               // {t, f} f in semitones float, 0 = C4
+  var simT = 0;
+  var cur = 4;                  // scale degree index
+  var target = 4, glide = 0;
+  var restUntil = 0;
+  var lastNoteShown = -1;
+
+  function pickNext(){
+    var deg = scaleSet();
+    var r = Math.random();
+    if (r < 0.12) { restUntil = simT + 0.6 + Math.random() * 1.2; return; }
+    var step = Math.random();
+    if (step < 0.45) cur = cur + (Math.random() < 0.5 ? -1 : 1);
+    else if (step < 0.7) cur = cur + (Math.random() < 0.5 ? -2 : 2);
+    else cur = Math.floor(Math.random() * 12);
+    cur = Math.max(0, Math.min(11, cur));
+    target = cur; glide = 0;
+  }
+
+  function midiFloat(){
+    var deg = scaleSet();
+    var semis = deg[((cur % 7) + 7) % 7] + 12 * Math.floor(cur / 7);
+    return semis + glide * 0.0 + (target === cur ? 0 : 0);
+  }
+
+  function frame(dt){
+    simT += dt;
+    if (simT > restUntil && Math.random() < dt * 1.4) pickNext();
+    var deg = scaleSet();
+    var degreeSemis = deg[((cur % 7) + 7) % 7];
+    var octShift = 12 * Math.floor(cur / 7);
+    // vibrato + wander, scaled by sensitivity
+    var wob = Math.sin(simT * 9) * 8 + Math.sin(simT * 23.7) * 4;
+    var gate = simT < restUntil ? 0 : 1;
+    var f = 60 + degreeSemis + octShift + wob / 100 * (0.4 + sens.value / 60);
+    trace.push({t: simT, f: gate ? f : null});
+    while (trace.length && trace[0].t < simT - 6) trace.shift();
+
+    // readout
+    var midi = Math.round(f);
+    var cents = Math.round((f - midi) * 100);
+    if (gate && midi !== lastNoteShown) {
+      lastNoteShown = midi;
+      var pc = ((midi % 12) + 12) % 12;
+      noteName.textContent = NAMES[pc];
+      noteOct.textContent = Math.floor(midi / 12) - 1;
+      lightKey(midi >= 60 && midi <= 83 ? midi : -1);
+      if (recording) { recCount++; sessionLine.innerHTML = 'Session: <b>' + recCount + '</b> notes captured (simulated)'; }
+    }
+    if (!gate && lastNoteShown !== -2) { lastNoteShown = -2; lightKey(-1); }
+    centsVal.textContent = (cents >= 0 ? '+' : '') + cents + ' ct';
+
+    draw(deg);
+  }
+
+  function draw(deg){
+    var W = canvas.width = canvas.clientWidth * (window.devicePixelRatio || 1);
+    var H = canvas.height = canvas.clientHeight * (window.devicePixelRatio || 1);
+    ctx.clearRect(0, 0, W, H);
+    var FLO = 58, FHI = 86; // C#4..D6 window
+    function y(f){ return H - ((f - FLO) / (FHI - FLO)) * H; }
+    // scale lanes
+    for (var s = FLO; s <= FHI; s++) {
+      var pc = ((s % 12) + 12) % 12;
+      var inScale = deg.indexOf(pc) >= 0;
+      ctx.fillStyle = inScale ? 'rgba(240,168,50,0.055)' : 'rgba(255,255,255,0.016)';
+      ctx.fillRect(0, y(s + 0.5), W, y(s - 0.5) - y(s + 0.5));
+    }
+    // center line for current target lane
+    ctx.strokeStyle = 'rgba(240,168,50,0.28)';
+    ctx.lineWidth = 1 * (window.devicePixelRatio || 1);
+    // trace
+    ctx.beginPath();
+    var started = false;
+    for (var i = 0; i < trace.length; i++) {
+      var p = trace[i];
+      if (p.f === null) { started = false; continue; }
+      var x = W - (simT - p.t) / 6 * W;
+      var yy2 = y(p.f);
+      if (!started) { ctx.moveTo(x, yy2); started = true; }
+      else ctx.lineTo(x, yy2);
+    }
+    ctx.strokeStyle = '#37e0c8';
+    ctx.lineWidth = 2.4 * (window.devicePixelRatio || 1);
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    // playhead dot at trace head
+    var last = null;
+    for (var j = trace.length - 1; j >= 0; j--) { if (trace[j].f !== null) { last = trace[j]; break; } }
+    if (last) {
+      ctx.beginPath();
+      ctx.arc(W - 8, y(last.f), 5 * (window.devicePixelRatio || 1), 0, 7);
+      ctx.fillStyle = '#f0a832';
+      ctx.fill();
+    }
+  }
+
+  var last = performance.now();
+  function loop(now){
+    var dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (running) frame(dt);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  btnSim.addEventListener('click', function(){
+    running = !running;
+    btnSim.textContent = running ? 'Pause simulation' : 'Resume simulation';
+  });
+  btnRec.addEventListener('click', function(){
+    recording = !recording;
+    btnRec.textContent = recording ? 'Stop' : 'Record';
+    btnRec.classList.toggle('primary', !recording);
+    if (!recording) sessionLine.innerHTML = 'Session: <b>' + recCount + '</b> notes captured (simulated). Download would export a .mid here.';
+  });
+  btnPanic.addEventListener('click', function(){
+    trace.length = 0; lightKey(-1);
+    sessionLine.innerHTML = 'Panic: all sound stopped (simulated). Session kept: <b>' + recCount + '</b> notes.';
+  });
+  keySel.addEventListener('change', function(){ trace.length = 0; });
+  scaleSel.addEventListener('change', function(){ trace.length = 0; });
+})();
+</script>
+</body>
+</html>
